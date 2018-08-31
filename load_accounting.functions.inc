@@ -281,6 +281,38 @@ function get_load_data($load, &$is_paid){
 		'label' => 'hidden',
 	]);
 
+	if(isset($element_confirmation['#items'])){
+		$i = 0;
+		foreach($element_confirmation['#items'] as $key => $item){
+			$i ++;
+
+			if($i > 1){
+				unset($element_confirmation[$key]);
+				continue;
+			}
+
+			$element_confirmation[$key]['#theme']             = 'file_link_extended';
+			$element_confirmation[$key]['#file']->description = 'confirmation.pdf';
+			$element_confirmation[$key]['#attributes']        = ['target' => '_blank'];
+		}
+	}
+
+	if(isset($element['#items'])){
+		$i = 0;
+		foreach($element['#items'] as $key => $item){
+			$i ++;
+
+			if($i > 1){
+				unset($element[$key]);
+				continue;
+			}
+
+			$element[$key]['#theme']             = 'file_link_extended';
+			$element[$key]['#file']->description = 'bol.pdf';
+			$element[$key]['#attributes']        = ['target' => '_blank'];
+		}
+	}
+
 	$bol_id = 'bol_' . $load['nid'];
 
 	$widget = [
@@ -310,7 +342,7 @@ function get_load_data($load, &$is_paid){
                                   </div>
                           </div>
                       </div>
-                  </div><a href="#" class="btn btn-default btn-upload-bol" id="btn-upload-' . $bol_id . '"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span></a>',
+                  </div>',
 	];
 
 	// Load Data
@@ -327,6 +359,7 @@ function get_load_data($load, &$is_paid){
 		'dispatcher'   => $load['ufull'],
 		'confirmation' => render($element_confirmation),
 		'bol'          => render($element) . ($is_paid ? '' : (empty($extra['bol']) ? '' : '<br/>') . render($widget)),
+		'upload'       => '<a href="#" class="btn btn-default btn-upload-bol" id="btn-upload-' . $bol_id . '"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span></a>',
 	];
 
 	return $load_data;
@@ -385,15 +418,49 @@ function load_accounting_upload_bol(&$form_state, $redirect){
 			move_uploaded_file($_FILES[$post_var]['tmp_name'], $destination);
 
 			file_save($file);
-			$file                              = file_load($file->fid);
-			$file->display                     = true;
-			$file->description                 = basename($destination);
-			$node->field_billoflading['und'][] = get_object_vars($file);
-			node_save($node);
+			$file              = file_load($file->fid);
+			$file->display     = true;
+			$file->description = basename($destination);
 
-			drupal_set_message('BOL File uploaded successful');
+			// delete old files
+			if(isset($node->field_billoflading['und'])){
+				foreach($node->field_billoflading['und'] as $item){
+					$old = file_load($item['fid']);
+					if($old !== false) file_delete($old, true);
+				}
+			}
+
+			$node->field_billoflading['und'] = [get_object_vars($file)];
+
+			try{
+				node_save($node);
+
+				drupal_set_message('BOL File uploaded successful');
+			} catch(Exception $e){
+				drupal_set_message('Error saving the BOL for the Load. Contact with your administrator. Error message: ' . $e->getMessage(), 'error');
+			}
 
 			drupal_goto("$redirect/{$form_state['storage']['truck']->truck_nid}");
 		}
 	}
+}
+
+/**
+ * Check app bonus from $form_state
+ *
+ * @param $form_state
+ *
+ * @return bool
+ */
+function is_app_bonus($form_state){
+	$app_bonus = false;
+	if(isset($form_state['storage']['truck']->customer_nid)){
+		$customer = node_load($form_state['storage']['truck']->customer_nid);
+		if(isset($customer->field_appbonus['und'][0]['value']) && intval($customer->field_appbonus['und'][0]['value']) == 1) // important, use the IF!!
+		{
+			$app_bonus = true;
+		}
+	}
+
+	return $app_bonus;
 }

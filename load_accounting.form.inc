@@ -277,16 +277,18 @@ function customer_reports_form($form, &$form_state){
 		// TODO: no se ejecuto en customer_reports_form_submit, deberia estar alli
 		load_accounting_upload_bol($form_state, 'accounting/customer/reports');
 
+		$hide_confirmations = is_app_bonus($form_state);
+
 		// Load List
 		foreach($loads as $key => $load){
 			$ispaid                      = [];
 			$load_data                   = get_load_data($load, $ispaid);
-			$loads[$key]['confirmation'] = $load_data['confirmation'];
+			if (!$hide_confirmations) $loads[$key]['confirmation'] = $load_data['confirmation'];
 			$loads[$key]['bol']          = $load_data['bol'];
 		}
 
 		$form['load_record'] = [
-			'#markup' => theme('load_record', ['loads' => $loads]),
+			'#markup' => theme('load_record', ['loads' => $loads, 'hide_confirmations' => $hide_confirmations]),
 		];
 
 		return $form;
@@ -301,6 +303,7 @@ function customer_reports_form($form, &$form_state){
 
 /**
  * Implements hook_form().
+ * @throws Exception
  */
 function customer_payments_form($form, &$form_state){
 
@@ -330,6 +333,8 @@ function customer_payments_form($form, &$form_state){
 	}
 
 	$form_state['storage']['truck']->profile = $profile;
+
+	$hide_confirmations = is_app_bonus($form_state);
 
 	// Set Compensation Type ($form_state['storage']['compensation'])
 	if($form_state['storage']['payment']['profile'] == 'customer'){
@@ -372,7 +377,11 @@ function customer_payments_form($form, &$form_state){
 				$driver->field_compensation['und'][0]['value']       = $comp_type;
 				$driver->field_compensation_value['und'][0]['value'] = $comp_value;
 
-				node_save($driver);
+				try{
+					node_save($driver);
+				} catch(Exception $e){
+					drupal_set_message('Internal error saving compensation. Contact with your administrator.','error');
+				}
 			}
 
 			$form_state['storage']['compensation']['type']  = $comp_type;
@@ -390,6 +399,9 @@ function customer_payments_form($form, &$form_state){
 				if($load['status'] == 'Completed'){
 					$is_paid   = false;
 					$load_data = get_load_data($load, $is_paid);
+
+					if ($hide_confirmations)
+						unset($load_data['confirmation']);
 
 					// Pending Loads
 					if( ! $is_paid){
@@ -409,7 +421,7 @@ function customer_payments_form($form, &$form_state){
 
 	// Header Load Panels ($form_state['storage']['loads']['header'])
 	if( ! isset($form_state['storage']['loads']['header'])){
-		$form_state['storage']['loads']['header'] = [
+		$loads_header = [
 			'title'        => t('4G ID'),
 			'miles'        => t('Miles'),
 			'empty'        => t('Empty'),
@@ -419,10 +431,16 @@ function customer_payments_form($form, &$form_state){
 			'to'           => t('To'),
 			'delivery'     => t('Delivery Date'),
 			'created'      => t('Created'),
-			'dispatcher'   => t('Dispatcher'),
-			'confirmation' => t('Confirmation'),
-			'bol'          => t('BOL'),
+			'dispatcher'   => t('Dispatcher')
 		];
+
+		if (!$hide_confirmations)
+			$loads_header['confirmation'] = t('Confirmation');
+
+		$loads_header['bol'] = t('BOL');
+		$loads_header['upload'] = '';
+
+		$form_state['storage']['loads']['header'] = $loads_header;
 	}
 
 	// Header Payment Panels ($form_state['storage']['loads']['header'])

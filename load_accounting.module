@@ -7,88 +7,150 @@ include_once 'load_accounting.functions.inc';
  * Implements hook_menu().
  */
 function load_accounting_menu(){
-  $items = array();
-  
-  $items['accounting/customer/trucks'] = array(
-    'title' => t('Customer Trucks'),
-    'page callback' => 'drupal_get_form',    
-    'page arguments' => array('customer_trucks_form'),
-    'access callback' => 'user_access',
-    'access arguments' => array('access customer trucks'),
-    'type' => MENU_NORMAL_ITEM,   
-  );
+	$items = [];
 
-  $items['accounting/customer/reports/%'] = array(
-    'title' => t('Truck Report'),
-    'page callback' => 'drupal_get_form',    
-    'page arguments' => array('customer_reports_form'),
-    'access callback' => 'user_access',
-    'access arguments' => array('access customer reports'),
-    'type' => MENU_NORMAL_ITEM,   
-  );
+	$items['accounting/customer/trucks'] = [
+		'title'            => t('Customer Trucks'),
+		'page callback'    => 'drupal_get_form',
+		'page arguments'   => ['customer_trucks_form'],
+		'access callback'  => 'user_access',
+		'access arguments' => ['access customer trucks'],
+		'type'             => MENU_NORMAL_ITEM,
+	];
 
-  $items['accounting/customer/payments/%'] = array(
-    'title' => t('Truck Payments'),
-    'page callback' => 'drupal_get_form',    
-    'page arguments' => array('customer_payments_form'),
-    'access callback' => 'user_access',
-    'access arguments' => array('access customer payments'),
-    'type' => MENU_NORMAL_ITEM,   
-  );
+	$items['accounting/customer/reports/%'] = [
+		'title'            => t('Truck Report'),
+		'page callback'    => 'drupal_get_form',
+		'page arguments'   => ['customer_reports_form'],
+		'access callback'  => 'user_access',
+		'access arguments' => ['access customer reports'],
+		'type'             => MENU_NORMAL_ITEM,
+	];
 
-  return $items;
+	$items['accounting/customer/payments/%'] = [
+		'title'            => t('Truck Payments'),
+		'page callback'    => 'drupal_get_form',
+		'page arguments'   => ['customer_payments_form'],
+		'access callback'  => 'user_access',
+		'access arguments' => ['access customer payments'],
+		'type'             => MENU_NORMAL_ITEM,
+	];
+
+	return $items;
 }
 
 
 /**
  * Implements hook_permission().
  */
-function load_accounting_permission() {
-  return array(
-    'access customer trucks' => array(
-      'title' => t('Access Customer Trucks Page'),
-      'description' => t('Give access to customer role.'),
-    ),
-    'access customer reports' => array(
-      'title' => t('Access Customer Reports Page'),
-      'description' => t('Give access to customer role.'),
-    ),
-    'access customer payments' => array(
-      'title' => t('Access Customer Payments Page'),
-      'description' => t('Give access to customer role.'),
-    ),
-  );
+function load_accounting_permission(){
+	return [
+		'access customer trucks'   => [
+			'title'       => t('Access Customer Trucks Page'),
+			'description' => t('Give access to customer role.'),
+		],
+		'access customer reports'  => [
+			'title'       => t('Access Customer Reports Page'),
+			'description' => t('Give access to customer role.'),
+		],
+		'access customer payments' => [
+			'title'       => t('Access Customer Payments Page'),
+			'description' => t('Give access to customer role.'),
+		],
+	];
 }
 
 /**
  * Implements hook_theme().
  */
-function load_accounting_theme() {
-  return array(
-    'my_trucks' => array(
-      'template' => 'my-trucks',
-      'variables' => array(
-        'report' => NULL, 
-        'trucks' => NULL
-      )
-    ),
-    'truck_profile' => array(
-      'template' => 'truck-profile',
-      'variables' => array(
-        'truck' => NULL
-      )
-    ),
-    'comparison_report' => array(
-      'template' => 'comparison-report',
-      'variables' => array(
-        'report' => NULL
-      )
-    ),
-    'load_record' => array(
-      'template' => 'load-record',
-      'variables' => array(
-        'loads' => NULL
-      )
-    )
-  );
+function load_accounting_theme(){
+	return [
+		'my_trucks'          => [
+			'template'  => 'my-trucks',
+			'variables' => [
+				'report' => null,
+				'trucks' => null,
+			],
+		],
+		'truck_profile'      => [
+			'template'  => 'truck-profile',
+			'variables' => [
+				'truck' => null,
+			],
+		],
+		'comparison_report'  => [
+			'template'  => 'comparison-report',
+			'variables' => [
+				'report' => null,
+			],
+		],
+		'load_record'        => [
+			'template'  => 'load-record',
+			'variables' => [
+				'loads' => null,
+			],
+		],
+		'file_link_extended' => [
+			'variables' => ['file' => null, 'icon_directory' => null, 'attributes' => []],
+		],
+	];
+}
+
+/**
+ * Implements hook_theme().
+ */
+function theme_file_link_extended($variables){
+	$file           = $variables['file'];
+	$icon_directory = $variables['icon_directory'];
+
+	$url = file_create_url($file->uri);
+
+	// Human-readable names, for use as text-alternatives to icons.
+	$mime_name = [
+		'application/msword'            => t('Microsoft Office document icon'),
+		'application/vnd.ms-excel'      => t('Office spreadsheet icon'),
+		'application/vnd.ms-powerpoint' => t('Office presentation icon'),
+		'application/pdf'               => t('PDF icon'),
+		'video/quicktime'               => t('Movie icon'),
+		'audio/mpeg'                    => t('Audio icon'),
+		'audio/wav'                     => t('Audio icon'),
+		'image/jpeg'                    => t('Image icon'),
+		'image/png'                     => t('Image icon'),
+		'image/gif'                     => t('Image icon'),
+		'application/zip'               => t('Package icon'),
+		'text/html'                     => t('HTML icon'),
+		'text/plain'                    => t('Plain text icon'),
+		'application/octet-stream'      => t('Binary Data'),
+	];
+
+	$mimetype = file_get_mimetype($file->uri);
+
+	$icon = theme('file_icon', [
+		'file'           => $file,
+		'icon_directory' => $icon_directory,
+		'alt'            => ! empty($mime_name[$mimetype]) ? $mime_name[$mimetype] : t('File'),
+	]);
+
+	// Set options as per anchor format described at
+	// http://microformats.org/wiki/file-format-examples
+	$options = [
+		'attributes' => [
+			'type' => $file->filemime . '; length=' . $file->filesize,
+		],
+	];
+
+	if(isset($variables['attributes'])){
+		$options['attributes'] = array_merge($options['attributes'], $variables['attributes']);
+	}
+
+	// Use the description as the link text if available.
+	if(empty($file->description)){
+		$link_text = $file->filename;
+	}
+	else{
+		$link_text                      = $file->description;
+		$options['attributes']['title'] = check_plain($file->filename);
+	}
+
+	return '<span class="file">' . $icon . ' ' . l($link_text, $url, $options) . '</span>';
 }
