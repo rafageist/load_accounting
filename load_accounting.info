@@ -1,6 +1,6 @@
 name = Load Accounting
 description = Truck performance, load record, payments mnagment, customer external access.     
 core = "7.x"
-version = 7.x-0.3
+version = 7.x-0.4
 project = 4 Global
 package = 4 Global
