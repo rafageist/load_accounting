@@ -1,0 +1,16 @@
+.float-right{
+    float: right;
+}
+.panel-heading .glyphicon
+{
+    float: right;
+}
+
+.form-control.tableselect_upload_file{
+    height: auto;
+}
+
+.btn-upload-bol{
+    float:right;
+
+}

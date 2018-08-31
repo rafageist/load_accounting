@@ -1,0 +1,94 @@
+<?php
+include_once 'load_accounting.form.inc';
+include_once 'load_accounting.submit.inc';
+include_once 'load_accounting.functions.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function load_accounting_menu(){
+  $items = array();
+  
+  $items['accounting/customer/trucks'] = array(
+    'title' => t('Customer Trucks'),
+    'page callback' => 'drupal_get_form',    
+    'page arguments' => array('customer_trucks_form'),
+    'access callback' => 'user_access',
+    'access arguments' => array('access customer trucks'),
+    'type' => MENU_NORMAL_ITEM,   
+  );
+
+  $items['accounting/customer/reports/%'] = array(
+    'title' => t('Truck Report'),
+    'page callback' => 'drupal_get_form',    
+    'page arguments' => array('customer_reports_form'),
+    'access callback' => 'user_access',
+    'access arguments' => array('access customer reports'),
+    'type' => MENU_NORMAL_ITEM,   
+  );
+
+  $items['accounting/customer/payments/%'] = array(
+    'title' => t('Truck Payments'),
+    'page callback' => 'drupal_get_form',    
+    'page arguments' => array('customer_payments_form'),
+    'access callback' => 'user_access',
+    'access arguments' => array('access customer payments'),
+    'type' => MENU_NORMAL_ITEM,   
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+function load_accounting_permission() {
+  return array(
+    'access customer trucks' => array(
+      'title' => t('Access Customer Trucks Page'),
+      'description' => t('Give access to customer role.'),
+    ),
+    'access customer reports' => array(
+      'title' => t('Access Customer Reports Page'),
+      'description' => t('Give access to customer role.'),
+    ),
+    'access customer payments' => array(
+      'title' => t('Access Customer Payments Page'),
+      'description' => t('Give access to customer role.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function load_accounting_theme() {
+  return array(
+    'my_trucks' => array(
+      'template' => 'my-trucks',
+      'variables' => array(
+        'report' => NULL, 
+        'trucks' => NULL
+      )
+    ),
+    'truck_profile' => array(
+      'template' => 'truck-profile',
+      'variables' => array(
+        'truck' => NULL
+      )
+    ),
+    'comparison_report' => array(
+      'template' => 'comparison-report',
+      'variables' => array(
+        'report' => NULL
+      )
+    ),
+    'load_record' => array(
+      'template' => 'load-record',
+      'variables' => array(
+        'loads' => NULL
+      )
+    )
+  );
+}
