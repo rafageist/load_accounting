@@ -266,7 +266,7 @@ function load_accounting_save_truck_nickname(&$form_state){
 	}
 }
 
-function get_load_data($load, &$is_paid){
+function get_load_data($load, &$is_paid, $force_show_upload = false){
 	// Extra Information
 	$extra   = get_load_extra($load['nid']);
 	$is_paid = db_select('truck_dataset_loads_paid', 'p')->fields('p')->condition('load_nid', $load['nid'], '=')->execute()->fetchAssoc();
@@ -358,7 +358,7 @@ function get_load_data($load, &$is_paid){
 		'created'      => format_date($load['created'], 'views'),
 		'dispatcher'   => $load['ufull'],
 		'confirmation' => render($element_confirmation),
-		'bol'          => render($element) . ($is_paid ? '' : (empty($extra['bol']) ? '' : '<br/>') . render($widget)),
+		'bol'          => render($element) . (($is_paid && !$force_show_upload) ? '' : (empty($extra['bol']) ? '' : '<br/>') . render($widget)),
 		'upload'       => '<a href="#" class="btn btn-default btn-upload-bol" id="btn-upload-' . $bol_id . '"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span></a>',
 	];
 

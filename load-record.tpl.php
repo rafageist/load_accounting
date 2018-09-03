@@ -23,6 +23,7 @@
                         <th>Confirmation</th>
 					<?php endif; ?>
                     <th>BOL</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -53,6 +54,7 @@
                             </td>
 						<?php endif; ?>
                         <td><?php print $value['bol']; ?></td>
+                        <td><?php print $value['upload']; ?></td>
                     </tr>
 				<?php endforeach; ?>
                 </tbody>

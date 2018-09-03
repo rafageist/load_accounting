@@ -281,10 +281,11 @@ function customer_reports_form($form, &$form_state){
 
 		// Load List
 		foreach($loads as $key => $load){
-			$ispaid                      = [];
-			$load_data                   = get_load_data($load, $ispaid);
-			if (!$hide_confirmations) $loads[$key]['confirmation'] = $load_data['confirmation'];
-			$loads[$key]['bol']          = $load_data['bol'];
+			$is_paid   = false;
+			$load_data = get_load_data($load, $is_paid, true);
+			if( ! $hide_confirmations) $loads[$key]['confirmation'] = $load_data['confirmation'];
+			$loads[$key]['bol']    = $load_data['bol'];
+			$loads[$key]['upload'] = $load_data['upload'];
 		}
 
 		$form['load_record'] = [
@@ -380,7 +381,7 @@ function customer_payments_form($form, &$form_state){
 				try{
 					node_save($driver);
 				} catch(Exception $e){
-					drupal_set_message('Internal error saving compensation. Contact with your administrator.','error');
+					drupal_set_message('Internal error saving compensation. Contact with your administrator.', 'error');
 				}
 			}
 
@@ -400,8 +401,9 @@ function customer_payments_form($form, &$form_state){
 					$is_paid   = false;
 					$load_data = get_load_data($load, $is_paid);
 
-					if ($hide_confirmations)
+					if($hide_confirmations){
 						unset($load_data['confirmation']);
+					}
 
 					// Pending Loads
 					if( ! $is_paid){
@@ -422,22 +424,23 @@ function customer_payments_form($form, &$form_state){
 	// Header Load Panels ($form_state['storage']['loads']['header'])
 	if( ! isset($form_state['storage']['loads']['header'])){
 		$loads_header = [
-			'title'        => t('4G ID'),
-			'miles'        => t('Miles'),
-			'empty'        => t('Empty'),
-			'payment'      => t('Payment'),
-			'rate'         => t('Rate'),
-			'from'         => t('From'),
-			'to'           => t('To'),
-			'delivery'     => t('Delivery Date'),
-			'created'      => t('Created'),
-			'dispatcher'   => t('Dispatcher')
+			'title'      => t('4G ID'),
+			'miles'      => t('Miles'),
+			'empty'      => t('Empty'),
+			'payment'    => t('Payment'),
+			'rate'       => t('Rate'),
+			'from'       => t('From'),
+			'to'         => t('To'),
+			'delivery'   => t('Delivery Date'),
+			'created'    => t('Created'),
+			'dispatcher' => t('Dispatcher'),
 		];
 
-		if (!$hide_confirmations)
+		if( ! $hide_confirmations){
 			$loads_header['confirmation'] = t('Confirmation');
+		}
 
-		$loads_header['bol'] = t('BOL');
+		$loads_header['bol']    = t('BOL');
 		$loads_header['upload'] = '';
 
 		$form_state['storage']['loads']['header'] = $loads_header;
@@ -518,31 +521,37 @@ function customer_payments_form($form, &$form_state){
 
 		// Show Payment Form
 		if($form_state['storage']['payment']['place']){
-			// Ajax Rate Event
-			if($form_state['input']['_triggering_element_name'] == 'frate'){
-				$form_state['storage']['payment']['rate']    = $form_state['values']['frate'];
-				$newpayment                                  = round($form_state['storage']['payment']['miles'] * $form_state['values']['frate'], 2);
-				$form_state['storage']['payment']['payment'] = $newpayment;
-				$form_state['storage']['payment']['total']   = $newpayment + $form_state['value']['faccesories'];
-				unset($form_state['input']['fpayment']);
-				unset($form_state['input']['ftotal']);
+			if (isset($form_state['input']['_triggering_element_name']))
+			{
+				// Ajax Rate Event
+				if($form_state['input']['_triggering_element_name'] == 'frate'){
+					$form_state['storage']['payment']['rate']    = $form_state['values']['frate'];
+					$newpayment                                  = round($form_state['storage']['payment']['miles'] * $form_state['values']['frate'], 2);
+					$form_state['storage']['payment']['payment'] = $newpayment;
+					$form_state['storage']['payment']['total']   = $newpayment + $form_state['values']['faccesories'];
+					unset($form_state['input']['fpayment']);
+					unset($form_state['input']['ftotal']);
+				}
+
+				// Ajax Payment Event
+				if($form_state['input']['_triggering_element_name'] == 'fpayment'){
+					$form_state['storage']['payment']['payment'] = $form_state['values']['fpayment'];
+					$newrate                                     = round($form_state['values']['fpayment'] / $form_state['storage']['payment']['miles'], 2);
+					$form_state['storage']['payment']['rate']    = $newrate;
+					$form_state['storage']['payment']['total']   = $form_state['values']['fpayment'] + $form_state['values']['faccesories'];
+					unset($form_state['input']['frate']);
+					unset($form_state['input']['ftotal']);
+				}
+
+				// Ajax Payment Event
+				if($form_state['input']['_triggering_element_name'] == 'faccesories'){
+					$form_state['storage']['payment']['accesories'] = $form_state['values']['faccesories'];
+					$newtotal                                       = $form_state['values']['faccesories'] + $form_state['storage']['payment']['payment'];
+					$form_state['storage']['payment']['total']      = $newtotal;
+					unset($form_state['input']['ftotal']);
+				}
 			}
-			// Ajax Payment Event
-			if($form_state['input']['_triggering_element_name'] == 'fpayment'){
-				$form_state['storage']['payment']['payment'] = $form_state['values']['fpayment'];
-				$newrate                                     = round($form_state['values']['fpayment'] / $form_state['storage']['payment']['miles'], 2);
-				$form_state['storage']['payment']['rate']    = $newrate;
-				$form_state['storage']['payment']['total']   = $form_state['values']['fpayment'] + $form_state['value']['faccesories'];
-				unset($form_state['input']['frate']);
-				unset($form_state['input']['ftotal']);
-			}
-			// Ajax Payment Event
-			if($form_state['input']['_triggering_element_name'] == 'faccesories'){
-				$form_state['storage']['payment']['accesories'] = $form_state['values']['faccesories'];
-				$newtotal                                       = $form_state['values']['faccesories'] + $form_state['storage']['payment']['payment'];
-				$form_state['storage']['payment']['total']      = $newtotal;
-				unset($form_state['input']['ftotal']);
-			}
+
 			// Form
 			$form['place'] = [
 				'#type'       => 'container',

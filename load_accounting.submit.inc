@@ -57,6 +57,7 @@ function customer_payments_form_submit($form, &$form_state){
 		$form_state['storage']['payment']['place'] = 1;
 		$form_state['storage']['payment']['miles'] = 10;
 		$abort                                     = false;
+		$missing                                   = [];
 		foreach($form_state['values']['pendloads'] as $key => $value){
 			if($value != 0){
 				$node = node_load($value);
@@ -66,23 +67,25 @@ function customer_payments_form_submit($form, &$form_state){
 					$pass = false;
 				}
 				elseif( ! isset($node->field_billoflading['und'])) $pass = false;
-				elseif(count($node->field_billoflading['und']) == 0) $pass = false;
+				elseif( ! isset($node->field_billoflading['und'][0])) $pass = false;
+				elseif(empty($node->field_billoflading['und'][0])) $pass = false;
 				elseif(empty($node->field_rate_confirmation)) $pass = false;
 				elseif( ! isset($node->field_rate_confirmation['und'])) $pass = false;
-				elseif(count($node->field_rate_confirmation['und']) == 0) $pass = false;
+				elseif( ! isset($node->field_rate_confirmation['und'][0])) $pass = false;
+				elseif(empty(($node->field_rate_confirmation['und'][0]))) $pass = false;
 
 				if( ! $pass){
-					drupal_set_message("Load {$node->title} can not be paid", 'error');
-					$abort = true;
-					break;
+					$abort     = true;
+					$missing[] = $node->title;
 				}
 				$form_state['storage']['payment']['miles'] += $node->field_total_miles['und'][0]['value'];
 			}
 		}
 
 		if($abort){
-			drupal_set_message('The payment was aborted', 'error');
+			drupal_set_message('Please upload BOL for the load(s): ' . implode(', ', $missing) . ' in order to generate the payment', 'error');
 			drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
+
 			return false;
 		}
 

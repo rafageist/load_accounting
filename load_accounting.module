@@ -103,6 +103,7 @@ function theme_file_link_extended($variables){
 	$file           = $variables['file'];
 	$icon_directory = $variables['icon_directory'];
 
+	if (!isset($file->uri)) return '';
 	$url = file_create_url($file->uri);
 
 	// Human-readable names, for use as text-alternatives to icons.

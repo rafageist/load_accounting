@@ -99,6 +99,7 @@
 <!-- Truck List Card -->
 <div class="row"> <?php
   global $base_path;
+  global $base_url;
   $base_image = $base_path . '/' . drupal_get_path('theme', 'load_subtheme') . '/pictures';
   setlocale(LC_MONETARY, 'en_US.UTF-8');
   $genid = 'gen_rat_rep_' . rand(150, 1500);
@@ -121,8 +122,8 @@
           <p><b>Dispatcher</b> <?php print $info['dispatcher']; ?></p>
           <p><b>Equipment</b> <?php print $info['equipment']; ?></p>
           <p>
-            <a class="btn btn-danger active" <?php print 'href="accounting/customer/reports/'.$nid.'"'; ?>>Load Reports</a>
-            <a class="btn btn-primary active" <?php print 'href="accounting/customer/payments/'.$nid.'"'; ?>>Payments</a>
+            <a class="btn btn-danger active" <?php print 'href="'.$base_url.'/accounting/customer/reports/'.$nid.'"'; ?>>Load Reports</a>
+            <a class="btn btn-primary active" <?php print 'href="'.$base_url.'/accounting/customer/payments/'.$nid.'"'; ?>>Payments</a>
           </p>
         </div>
       </div>
