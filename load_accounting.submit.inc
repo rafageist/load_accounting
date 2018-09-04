@@ -21,14 +21,13 @@ function customer_reports_form_submit($form, &$form_state){
 function customer_payments_form_submit($form, &$form_state){
 
 	global $user;
-
 	// SET LOADS AS PAID
 	if($form_state['values']['op'] == 'Set As Paid'){
 		$form_state['storage']['payment']['place'] = 0;
-		$count                                     = 0;
+		$count = 0;
 		foreach($form_state['values']['pendloads'] as $key => $value){
 			if($value != 0){
-				$node                                = node_load($value);
+				$node = node_load($value);
 				$node->field_paid['und'][0]['value'] = 1;
 				node_save($node);
 				$count ++;
@@ -40,10 +39,10 @@ function customer_payments_form_submit($form, &$form_state){
 	} // SET LOADS AS PENDING
 	elseif($form_state['values']['op'] == 'Set As Pending'){
 		$form_state['storage']['payment']['place'] = 0;
-		$count                                     = 0;
+		$count = 0;
 		foreach($form_state['values']['paidloads'] as $key => $value){
 			if($value != 0){
-				$node                                = node_load($value);
+				$node = node_load($value);
 				$node->field_paid['und'][0]['value'] = 0;
 				node_save($node);
 				$count ++;
@@ -56,13 +55,16 @@ function customer_payments_form_submit($form, &$form_state){
 	elseif($form_state['values']['op'] == 'Make Payment'){
 		$form_state['storage']['payment']['place'] = 1;
 		$form_state['storage']['payment']['miles'] = 10;
-		$abort                                     = false;
-		$missing                                   = [];
+		$abort = false;
+		$missing = [];
+		$count = 0;
+		$sumToMiles = 0;
 		foreach($form_state['values']['pendloads'] as $key => $value){
 			if($value != 0){
 				$node = node_load($value);
 
 				$pass = true;
+
 				if(empty($node->field_billoflading)){
 					$pass = false;
 				}
@@ -75,10 +77,13 @@ function customer_payments_form_submit($form, &$form_state){
 				elseif(empty(($node->field_rate_confirmation['und'][0]))) $pass = false;
 
 				if( ! $pass){
-					$abort     = true;
+					$abort = true;
 					$missing[] = $node->title;
 				}
-				$form_state['storage']['payment']['miles'] += $node->field_total_miles['und'][0]['value'];
+
+				$count ++;
+
+				$sumToMiles += $node->field_total_miles['und'][0]['value'];
 			}
 		}
 
@@ -89,22 +94,31 @@ function customer_payments_form_submit($form, &$form_state){
 			return false;
 		}
 
+		if($count == 0){
+			drupal_set_message('One load must be selected at least', 'error');
+			drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
+
+			return false;
+		}
+
+		$form_state['storage']['payment']['miles'] += $sumToMiles;
+
 		// Rate
-		$form_state['storage']['payment']['rate']       = 0;
-		$form_state['storage']['payment']['payment']    = 0;
+		$form_state['storage']['payment']['rate'] = 0;
+		$form_state['storage']['payment']['payment'] = 0;
 		$form_state['storage']['payment']['accesories'] = 0;
-		$form_state['storage']['payment']['total']      = 0;
+		$form_state['storage']['payment']['total'] = 0;
 
 		switch($form_state['storage']['compensation']['type']){
 			case 'Rate x Miles':
-				$form_state['storage']['payment']['rate']    = $form_state['storage']['compensation']['value'];
+				$form_state['storage']['payment']['rate'] = $form_state['storage']['compensation']['value'];
 				$form_state['storage']['payment']['payment'] = round($form_state['storage']['compensation']['value'] * $form_state['storage']['payment']['miles'], 2);
-				$form_state['storage']['payment']['total']   = $form_state['storage']['payment']['payment'];
+				$form_state['storage']['payment']['total'] = $form_state['storage']['payment']['payment'];
 				break;
 			case 'Weekly Salary':
 				$form_state['storage']['payment']['payment'] = $form_state['storage']['compensation']['value'];
-				$form_state['storage']['payment']['rate']    = round($form_state['storage']['compensation']['value'] / $form_state['storage']['payment']['miles'], 2);
-				$form_state['storage']['payment']['total']   = $form_state['storage']['payment']['payment'];
+				$form_state['storage']['payment']['rate'] = round($form_state['storage']['compensation']['value'] / $form_state['storage']['payment']['miles'], 2);
+				$form_state['storage']['payment']['total'] = $form_state['storage']['payment']['payment'];
 				break;
 			default:
 				break;
@@ -112,10 +126,11 @@ function customer_payments_form_submit($form, &$form_state){
 	} // REGISTER PAYMENT
 	elseif($form_state['values']['op'] == 'Save'){
 		$form_state['storage']['payment']['place'] = 0;
-		$entity                                    = entity_create('node', ['type' => 'payment']);
-		$entity->uid                               = $user->uid;
-		$wrap                                      = entity_metadata_wrapper('node', $entity);
+		$entity = entity_create('node', ['type' => 'payment']);
+		$entity->uid = $user->uid;
+		$wrap = entity_metadata_wrapper('node', $entity);
 		$wrap->title->set(time());
+		$wrap->field_payment_date->set(!empty($form_state['values']['fpaymentdate']) ? strtotime($form_state['values']['fpaymentdate']) : time());
 		$wrap->field_miles->set($form_state['values']['fmiles']);
 		$wrap->field_rate->set($form_state['values']['frate']);
 		$wrap->field_payment->set($form_state['values']['fpayment']);
@@ -127,11 +142,10 @@ function customer_payments_form_submit($form, &$form_state){
 		$wrap->field_single_driver->set($form_state['storage']['truck']->driver_nid);
 		$wrap->field_truck->set($form_state['storage']['truck']->truck_nid);
 		$count = 0;
+
 		foreach($form_state['values']['pendloads'] as $key => $value){
 			if($value != 0){
 				$node = node_load($value);
-
-
 				$node->field_paid['und'][0]['value'] = 1;
 				node_save($node);
 				$form_state['storage']['loads']['paid'][$value] = $form_state['storage']['loads']['pending'][$value];

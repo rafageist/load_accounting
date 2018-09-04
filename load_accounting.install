@@ -1,0 +1,89 @@
+<?php
+
+function load_accounting_install(){
+
+	// field_payment_date field
+	$field = [
+		'settings' => [
+			'granularity' => [
+				'month' => 'month',
+				'day' => 'day',
+				'hour' => 'hour',
+				'minute' => 'minute',
+				'year' => 'year',
+				'second' => 0,
+			],
+			'tz_handling' => 'none',
+			'timezone_db' => '',
+			'cache_enabled' => 0,
+			'cache_count' => '4',
+			'todate' => '',
+		],
+		'field_name' => 'field_payment_date',
+		'type' => 'datetime',
+		'cardinality' => '1',
+	];
+
+	if(field_info_field($field['field_name']) === null){
+		try{
+			field_create_field($field);
+		} catch(FieldException $e){
+		}
+	}
+
+
+	$instance = [
+		'label' => 'Payment Date',
+		'widget' => [
+			'weight' => '12',
+			'type' => 'date_popup',
+			'module' => 'date',
+			'active' => 1,
+			'settings' => [
+				'input_format' => 'm/d/Y - H:i:s',
+				'input_format_custom' => '',
+				'year_range' => '-2:+0',
+				'increment' => '5',
+				'label_position' => 'above',
+				'text_parts' => [],
+				'no_fieldset' => 1,
+			],
+		],
+		'settings' => [
+			'default_value' => 'now',
+			'default_value_code' => '',
+			'default_value2' => 'same',
+			'default_value_code2' => '',
+			'user_register_form' => false,
+		],
+		'display' => [
+			'default' => [
+				'label' => 'above',
+				'type' => 'date_default',
+				'settings' => [
+					'format_type' => 'long',
+					'multiple_number' => '',
+					'multiple_from' => '',
+					'multiple_to' => '',
+					'fromto' => 'both',
+					'show_remaining_days' => false,
+				],
+				'module' => 'date',
+				'weight' => 11,
+			],
+		],
+		'required' => 1,
+		'description' => '',
+		'field_name' => 'field_payment_date',
+		'entity_type' => 'node',
+		'bundle' => 'payment',
+		'deleted' => '0',
+	];
+
+	if(field_info_instance('node', 'field_payment_date', 'payment') === null){
+		try{
+			field_create_instance($instance);
+		} catch(FieldException $e){
+		}
+	}
+}

@@ -151,3 +151,20 @@
 </div>
 
 <?php  drupal_add_js(drupal_get_path('module', 'load_accounting') . '/js/load_accounting.js'); ?>
+
+<!-- confirm modal dialog -->
+<div id="confirm-dialog" tabindex="-1" class="modal fade in">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="confirm-title"></h4></div>
+            <div class="modal-body" id="confirm-text">
+            </div>
+            <div class="modal-footer">
+                <button class ="btn btn-primary" type="submit" name="confirm-dialog-submit" id="confirm-dialog-submit" value=""><?php echo t('Yes'); ?></button>
+                <button class="btn btn-default" type="button" data-dismiss="modal"><?php echo t('No'); ?></button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -45,9 +45,21 @@
 
             $(".btn-upload-bol").click(function(){
                 var id = "#miniform-upload-"+($(this).attr('id').replace('btn-upload-',''));
-                //alert(id);
                 $(id).modal();
             });
+
+            var modalConfirm = function(title, text, submitFlag) {
+                $("#confirm-title").html(Drupal.t(title));
+                $("#confirm-text").html(Drupal.t(text));
+                $("#confirm-dialog-submit").attr('value',submitFlag);
+                $("#confirm-dialog").modal();
+            };
+
+            $(".btn-delete-payment").click(function(){
+                var id = $(this).attr('data-payment-id');
+                modalConfirm('Confirmation', 'Associated loads will be set as unpaid. You cannot undo this action. Are you sure you want to delete this payment?', id);
+            });
+
         }
     };
 })(jQuery);

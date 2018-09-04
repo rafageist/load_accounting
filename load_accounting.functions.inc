@@ -11,7 +11,7 @@ function get_truck_info($tid){
  */
 function get_truck_loads($tid){
 	$output = [];
-	$loads  = db_select('truck_dataset_loads', 't')->fields('t')->condition('truck_nid', $tid, '=')->orderBy('load_created', 'ASC')->execute()->fetchAll();
+	$loads = db_select('truck_dataset_loads', 't')->fields('t')->condition('truck_nid', $tid, '=')->orderBy('load_created', 'ASC')->execute()->fetchAll();
 
 	// LOADS
 	foreach($loads as $value){
@@ -46,7 +46,7 @@ function get_load_extra($lid){
 
 	if(count($points) > 0){
 		$output['from'] = $points[0]->city . ' ' . $points[0]->state;
-		$output['to']   = $points[count($points) - 1]->city . ' ' . $points[count($points) - 1]->state;
+		$output['to'] = $points[count($points) - 1]->city . ' ' . $points[count($points) - 1]->state;
 	}
 
 	// DELIVERY DATE
@@ -114,14 +114,14 @@ function get_loads_report($loads, $this_week, $last_week, $this_month, $last_mon
 			$report['ever']['count'] ++;
 			$report['ever']['total'] += $value['miles'];
 			$report['ever']['empty'] += $value['empty'];
-			$report['ever']['sold']  += $value['payment'];
+			$report['ever']['sold'] += $value['payment'];
 
 			// YEAR
 			if($value['created'] > $this_year){
 				$report['thisyear']['count'] ++;
 				$report['thisyear']['total'] += $value['miles'];
 				$report['thisyear']['empty'] += $value['empty'];
-				$report['thisyear']['sold']  += $value['payment'];
+				$report['thisyear']['sold'] += $value['payment'];
 			}
 
 			// LAST MONTH
@@ -129,7 +129,7 @@ function get_loads_report($loads, $this_week, $last_week, $this_month, $last_mon
 				$report['lastmonth']['count'] ++;
 				$report['lastmonth']['total'] += $value['miles'];
 				$report['lastmonth']['empty'] += $value['empty'];
-				$report['lastmonth']['sold']  += $value['payment'];
+				$report['lastmonth']['sold'] += $value['payment'];
 			}
 
 			// THIS  MONTH
@@ -137,7 +137,7 @@ function get_loads_report($loads, $this_week, $last_week, $this_month, $last_mon
 				$report['thismonth']['count'] ++;
 				$report['thismonth']['total'] += $value['miles'];
 				$report['thismonth']['empty'] += $value['empty'];
-				$report['thismonth']['sold']  += $value['payment'];
+				$report['thismonth']['sold'] += $value['payment'];
 			}
 
 			// LAST WEEK
@@ -145,7 +145,7 @@ function get_loads_report($loads, $this_week, $last_week, $this_month, $last_mon
 				$report['lastweek']['count'] ++;
 				$report['lastweek']['total'] += $value['miles'];
 				$report['lastweek']['empty'] += $value['empty'];
-				$report['lastweek']['sold']  += $value['payment'];
+				$report['lastweek']['sold'] += $value['payment'];
 			}
 
 			// THIS WEEK
@@ -153,44 +153,44 @@ function get_loads_report($loads, $this_week, $last_week, $this_month, $last_mon
 				$report['thisweek']['count'] ++;
 				$report['thisweek']['total'] += $value['miles'];
 				$report['thisweek']['empty'] += $value['empty'];
-				$report['thisweek']['sold']  += $value['payment'];
+				$report['thisweek']['sold'] += $value['payment'];
 			}
 		}
 	}
 
 	// EVER RATE
 	if($report['ever']['sold'] != 0 && $report['ever']['total'] != 0){
-		$rate                   = $report['ever']['sold'] / $report['ever']['total'];
+		$rate = $report['ever']['sold'] / $report['ever']['total'];
 		$report['ever']['rate'] = ! is_nan($rate) ? round($rate, 2) : 0;
 	}
 
 	// YEAR RATE
 	if($report['thisyear']['sold'] != 0 && $report['thisyear']['total'] != 0){
-		$rate                       = $report['thisyear']['sold'] / $report['thisyear']['total'];
+		$rate = $report['thisyear']['sold'] / $report['thisyear']['total'];
 		$report['thisyear']['rate'] = ! is_nan($rate) ? round($rate, 2) : 0;
 	}
 
 	// LAST MONTH RATE
 	if($report['lastmonth']['sold'] != 0 && $report['lastmonth']['total'] != 0){
-		$rate                        = $report['lastmonth']['sold'] / $report['lastmonth']['total'];
+		$rate = $report['lastmonth']['sold'] / $report['lastmonth']['total'];
 		$report['lastmonth']['rate'] = ! is_nan($rate) ? round($rate, 2) : 0;
 	}
 
 	// THIS MONTH RATE
 	if($report['thismonth']['sold'] != 0 && $report['thismonth']['total'] != 0){
-		$rate                        = $report['thismonth']['sold'] / $report['thismonth']['total'];
+		$rate = $report['thismonth']['sold'] / $report['thismonth']['total'];
 		$report['thismonth']['rate'] = ! is_nan($rate) ? round($rate, 2) : 0;
 	}
 
 	// LAST WEEK MONTH RATE
 	if($report['lastweek']['sold'] != 0 && $report['lastweek']['total'] != 0){
-		$rate                       = $report['lastweek']['sold'] / $report['lastweek']['total'];
+		$rate = $report['lastweek']['sold'] / $report['lastweek']['total'];
 		$report['lastweek']['rate'] = ! is_nan($rate) ? round($rate, 2) : 0;
 	}
 
 	// THIS WEEK RATE
 	if($report['thisweek']['sold'] != 0 && $report['thisweek']['total'] != 0){
-		$rate                       = $report['thisweek']['sold'] / $report['thisweek']['total'];
+		$rate = $report['thisweek']['sold'] / $report['thisweek']['total'];
 		$report['thisweek']['rate'] = ! is_nan($rate) ? round($rate, 2) : 0;
 	}
 
@@ -207,14 +207,14 @@ function get_payment_profile($truck){
 	if(empty($truck)) return 'unknown';
 
 	// Security Check
-	$profile        = 'unknown';
+	$profile = 'unknown';
 	$truck_customer = isset($truck->customer_nid) ? $truck->customer_nid : 0;
-	$truck_company  = isset($truck->company_nid) ? $truck->company_nid : 0;
+	$truck_company = isset($truck->company_nid) ? $truck->company_nid : 0;
 
 	// Set Profile
 	if($truck_customer != 0 || $truck_company != 0){
 		global $user;
-		$usr           = user_load($user->uid);
+		$usr = user_load($user->uid);
 		$user_customer = 0;
 
 		if(isset($usr->field_customer['und'][0]['target_id'])){
@@ -257,7 +257,7 @@ function load_accounting_save_truck_nickname(&$form_state){
 	if($form_state['submitted'] || $form_id = 'customer_reports_form'){
 		if(isset($form_state['input']['btnSaveTruckNickname']) && $form_state['input']['btnSaveTruckNickname'] == 'save-truck-nickname'){
 			if(isset($form_state['storage']['truck'])){
-				$truck                                    = node_load($form_state['storage']['truck']->truck_nid);
+				$truck = node_load($form_state['storage']['truck']->truck_nid);
 				$truck->field_nickname['und'][0]['value'] = $form_state['input']['truck-nickname'];
 				node_save($truck);
 				drupal_set_message('Truck nick name was updated as <i>' . $form_state['input']['truck-nickname'] . '</i>');
@@ -268,12 +268,12 @@ function load_accounting_save_truck_nickname(&$form_state){
 
 function get_load_data($load, &$is_paid, $force_show_upload = false){
 	// Extra Information
-	$extra   = get_load_extra($load['nid']);
+	$extra = get_load_extra($load['nid']);
 	$is_paid = db_select('truck_dataset_loads_paid', 'p')->fields('p')->condition('load_nid', $load['nid'], '=')->execute()->fetchAssoc();
 	$is_paid = ! (empty($is_paid['paid']) && ! $is_paid['paid']);
 
 	$node_load = node_load($load['nid']);
-	$element   = field_view_field('node', $node_load, 'field_billoflading', [
+	$element = field_view_field('node', $node_load, 'field_billoflading', [
 		'label' => 'hidden',
 	]);
 
@@ -291,9 +291,9 @@ function get_load_data($load, &$is_paid, $force_show_upload = false){
 				continue;
 			}
 
-			$element_confirmation[$key]['#theme']             = 'file_link_extended';
+			$element_confirmation[$key]['#theme'] = 'file_link_extended';
 			$element_confirmation[$key]['#file']->description = 'confirmation.pdf';
-			$element_confirmation[$key]['#attributes']        = ['target' => '_blank'];
+			$element_confirmation[$key]['#attributes'] = ['target' => '_blank'];
 		}
 	}
 
@@ -307,9 +307,9 @@ function get_load_data($load, &$is_paid, $force_show_upload = false){
 				continue;
 			}
 
-			$element[$key]['#theme']             = 'file_link_extended';
+			$element[$key]['#theme'] = 'file_link_extended';
 			$element[$key]['#file']->description = 'bol.pdf';
-			$element[$key]['#attributes']        = ['target' => '_blank'];
+			$element[$key]['#attributes'] = ['target' => '_blank'];
 		}
 	}
 
@@ -358,7 +358,7 @@ function get_load_data($load, &$is_paid, $force_show_upload = false){
 		'created'      => format_date($load['created'], 'views'),
 		'dispatcher'   => $load['ufull'],
 		'confirmation' => render($element_confirmation),
-		'bol'          => render($element) . (($is_paid && !$force_show_upload) ? '' : (empty($extra['bol']) ? '' : '<br/>') . render($widget)),
+		'bol'          => render($element) . (($is_paid && ! $force_show_upload) ? '' : (empty($extra['bol']) ? '' : '<br/>') . render($widget)),
 		'upload'       => '<a href="#" class="btn btn-default btn-upload-bol" id="btn-upload-' . $bol_id . '"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span></a>',
 	];
 
@@ -377,20 +377,20 @@ function load_accounting_upload_bol(&$form_state, $redirect){
 	// Process upload of BOL files
 	if(isset($form_state['input']['btnUploadBOL'])){
 		$prefix = 'upload-bol_';
-		$value  = $form_state['input']['btnUploadBOL'];
+		$value = $form_state['input']['btnUploadBOL'];
 		if(strpos($value, $prefix) == 0){
 			$load_id = substr($value, strlen($prefix));
-			$node    = node_load($load_id);
+			$node = node_load($load_id);
 
 			if(empty($node->field_billoflading)){
 				$node->field_billoflading['und'] = [];
 			}
 
-			$post_var    = 'bol_' . $load_id;
-			$filename    = $_FILES[$post_var]['name'];//form_state['input'][$post_var ];
-			$url         = 'public://bol/' . $filename;
-			$url_full    = file_create_url($url);
-			$path        = DRUPAL_ROOT . "/" . substr($url_full, strpos($url_full, 'sites/default/files'));
+			$post_var = 'bol_' . $load_id;
+			$filename = $_FILES[$post_var]['name'];//form_state['input'][$post_var ];
+			$url = 'public://bol/' . $filename;
+			$url_full = file_create_url($url);
+			$path = DRUPAL_ROOT . "/" . substr($url_full, strpos($url_full, 'sites/default/files'));
 			$destination = file_destination($path, FILE_EXISTS_RENAME);
 
 			$file = (object) [
@@ -418,8 +418,8 @@ function load_accounting_upload_bol(&$form_state, $redirect){
 			move_uploaded_file($_FILES[$post_var]['tmp_name'], $destination);
 
 			file_save($file);
-			$file              = file_load($file->fid);
-			$file->display     = true;
+			$file = file_load($file->fid);
+			$file->display = true;
 			$file->description = basename($destination);
 
 			// delete old files

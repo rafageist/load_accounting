@@ -100,10 +100,10 @@ function load_accounting_theme(){
  * Implements hook_theme().
  */
 function theme_file_link_extended($variables){
-	$file           = $variables['file'];
+	$file = $variables['file'];
 	$icon_directory = $variables['icon_directory'];
 
-	if (!isset($file->uri)) return '';
+	if( ! isset($file->uri)) return '';
 	$url = file_create_url($file->uri);
 
 	// Human-readable names, for use as text-alternatives to icons.
@@ -149,7 +149,7 @@ function theme_file_link_extended($variables){
 		$link_text = $file->filename;
 	}
 	else{
-		$link_text                      = $file->description;
+		$link_text = $file->description;
 		$options['attributes']['title'] = check_plain($file->filename);
 	}
 
