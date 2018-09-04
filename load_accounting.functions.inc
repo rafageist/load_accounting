@@ -16,17 +16,17 @@ function get_truck_loads($tid){
 	// LOADS
 	foreach($loads as $value){
 		$output[$value->load_nid] = [
-			'nid'      => $value->load_nid,
-			'title'    => $value->load_title,
-			'status'   => $value->load_status,
-			'created'  => $value->load_created,
-			'miles'    => $value->load_miles,
-			'empty'    => $value->load_empty,
-			'rate'     => $value->load_rate,
-			'payment'  => $value->load_payment,
-			'uid'      => $value->load_author_uid,
-			'uname'    => $value->load_author_user,
-			'ufull'    => $value->load_author_full,
+			'nid' => $value->load_nid,
+			'title' => $value->load_title,
+			'status' => $value->load_status,
+			'created' => $value->load_created,
+			'miles' => $value->load_miles,
+			'empty' => $value->load_empty,
+			'rate' => $value->load_rate,
+			'payment' => $value->load_payment,
+			'uid' => $value->load_author_uid,
+			'uname' => $value->load_author_user,
+			'ufull' => $value->load_author_full,
 			'trucknid' => $value->truck_nid,
 		];
 	}
@@ -99,12 +99,12 @@ function filter_loads($loads, $from = null, $to = null){
 function get_loads_report($loads, $this_week, $last_week, $this_month, $last_month, $this_year){
 	// INITIAL REPORT
 	$report = [
-		'thisweek'  => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
-		'lastweek'  => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
+		'thisweek' => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
+		'lastweek' => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
 		'thismonth' => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
 		'lastmonth' => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
-		'thisyear'  => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
-		'ever'      => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
+		'thisyear' => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
+		'ever' => ['count' => 0, 'total' => 0, 'empty' => 0, 'sold' => 0, 'rate' => 0],
 	];
 
 	// LOAD ANALIZER
@@ -316,24 +316,24 @@ function get_load_data($load, &$is_paid, $force_show_upload = false){
 	$bol_id = 'bol_' . $load['nid'];
 
 	$widget = [
-		'#title'             => null,
-		'#type'              => 'file',
-		'#default_value'     => $extra['bol'],
-		'#description'       => null,
+		'#title' => null,
+		'#type' => 'file',
+		'#default_value' => $extra['bol'],
+		'#description' => null,
 		'#upload_validators' => ['file_validate_extensions' => ['pdf jpg jpeg']],
-		'#upload_location'   => 'public://loads_bol/',
-		'#attributes'        => [
+		'#upload_location' => 'public://loads_bol/',
+		'#attributes' => [
 			'class' => ['tableselect_upload_file'],
-			'name'  => 'bol_' . $load['nid'],
+			'name' => 'bol_' . $load['nid'],
 		],
-		'#prefix'            => '<div id="miniform-upload-' . $bol_id . '" role="dialog" tabindex="-1" class="modal fade in">
+		'#prefix' => '<div id="miniform-upload-' . $bol_id . '" role="dialog" tabindex="-1" class="modal fade in">
                                         <div class="modal-dialog modal-sm" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                             <h4 class="modal-title">' . t('Upload new BOL') . '</h4></div>
                                   <div class="modal-body">
                                       <div class="form-group">',
-		'#suffix'            => '</div>
+		'#suffix' => '</div>
                                   </div>
 
                                   <div class="modal-footer">
@@ -347,19 +347,19 @@ function get_load_data($load, &$is_paid, $force_show_upload = false){
 
 	// Load Data
 	$load_data = [
-		'title'        => $load['title'],
-		'miles'        => $load['miles'],
-		'empty'        => $load['empty'],
-		'payment'      => $load['payment'],
-		'rate'         => $load['rate'],
-		'from'         => $extra['from'],
-		'to'           => $extra['to'],
-		'delivery'     => format_date(strtotime($extra['delivery']), 'views'),
-		'created'      => format_date($load['created'], 'views'),
-		'dispatcher'   => $load['ufull'],
+		'title' => $load['title'],
+		'miles' => $load['miles'],
+		'empty' => $load['empty'],
+		'payment' => $load['payment'],
+		'rate' => $load['rate'],
+		'from' => $extra['from'],
+		'to' => $extra['to'],
+		'delivery' => format_date(strtotime($extra['delivery']), 'views'),
+		'created' => format_date($load['created'], 'views'),
+		'dispatcher' => $load['ufull'],
 		'confirmation' => render($element_confirmation),
-		'bol'          => render($element) . (($is_paid && ! $force_show_upload) ? '' : (empty($extra['bol']) ? '' : '<br/>') . render($widget)),
-		'upload'       => '<a href="#" class="btn btn-default btn-upload-bol" id="btn-upload-' . $bol_id . '"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span></a>',
+		'bol' => render($element) . (($is_paid && ! $force_show_upload) ? '' : (empty($extra['bol']) ? '' : '<br/>') . render($widget)),
+		'upload' => '<a href="#" class="btn btn-default btn-upload-bol" id="btn-upload-' . $bol_id . '"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span></a>',
 	];
 
 	return $load_data;
@@ -394,13 +394,13 @@ function load_accounting_upload_bol(&$form_state, $redirect){
 			$destination = file_destination($path, FILE_EXISTS_RENAME);
 
 			$file = (object) [
-				'fid'       => null,
-				'uid'       => $user->uid,
-				'filename'  => basename($destination),
-				'uri'       => 'public://bol/' . basename($destination),
-				'filemime'  => $_FILES[$post_var]['type'],
-				'filesize'  => $_FILES[$post_var]['size'],
-				'status'    => FILE_STATUS_PERMANENT,
+				'fid' => null,
+				'uid' => $user->uid,
+				'filename' => basename($destination),
+				'uri' => 'public://bol/' . basename($destination),
+				'filemime' => $_FILES[$post_var]['type'],
+				'filesize' => $_FILES[$post_var]['size'],
+				'status' => FILE_STATUS_PERMANENT,
 				'timestamp' => REQUEST_TIME,
 			];
 
@@ -463,4 +463,53 @@ function is_app_bonus($form_state){
 	}
 
 	return $app_bonus;
+}
+
+/**
+ * Delete a payment
+ *
+ * @param $payment_id
+ * @param $form_state
+ *
+ * @return bool
+ */
+function load_accounting_delete_payment($payment_id, &$form_state){
+	$node = node_load($payment_id);
+
+	if($node === false) return false;
+
+	if(isset($node->field_loads['und'])){
+
+		$loads = $node->field_loads['und'];
+
+		if(is_array($loads)){
+			foreach($loads as $target){
+
+				$load = node_load($target['target_id']);
+
+				if($load === false) continue;
+
+				switch($form_state['storage']['payment']['profile']){
+					case 'customer':
+						$load->field_paid['und'][0]['value'] = 0;
+						break;
+					case 'carrier':
+						$load->field_customer_paid['und'][0]['value'] = 0;
+						break;
+				}
+
+				try{
+					node_save($load);
+				} catch(Exception $e){
+
+				}
+			}
+		}
+	}
+
+	node_delete($payment_id);
+
+	drupal_set_message('Payment ' . $node->title . ' was deleted successful');
+
+	return true;
 }

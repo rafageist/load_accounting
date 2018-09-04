@@ -130,7 +130,7 @@ function customer_payments_form_submit($form, &$form_state){
 		$entity->uid = $user->uid;
 		$wrap = entity_metadata_wrapper('node', $entity);
 		$wrap->title->set(time());
-		$wrap->field_payment_date->set(!empty($form_state['values']['fpaymentdate']) ? strtotime($form_state['values']['fpaymentdate']) : time());
+		$wrap->field_payment_date->set(! empty($form_state['values']['fpaymentdate']) ? strtotime($form_state['values']['fpaymentdate']) : time());
 		$wrap->field_miles->set($form_state['values']['fmiles']);
 		$wrap->field_rate->set($form_state['values']['frate']);
 		$wrap->field_payment->set($form_state['values']['fpayment']);
@@ -162,6 +162,49 @@ function customer_payments_form_submit($form, &$form_state){
 	}
 
 	load_accounting_upload_bol($form_state, 'accounting/customer/payments');
+
+	// delete a payment before load payments
+	if(isset($form_state['input']['confirm-dialog-flag']) && $form_state['input']['confirm-dialog-flag'] == 'delete-payment'){
+		if(isset($form_state['input']['confirm-dialog-submit']) && ! empty($form_state['input']['confirm-dialog-submit'])){
+			$payment_id = $form_state['input']['confirm-dialog-submit'];
+			load_accounting_delete_payment($payment_id, $form_state);
+
+			if(isset($form_state['storage']['payment']['list'][$payment_id])){
+				unset($form_state['storage']['payment']['list'][$payment_id]);
+			}
+
+			drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
+
+			return true;
+		}
+	}
+
+	// delete bulk payment list
+	if(isset($form_state['input']['confirm-dialog-flag']) && $form_state['input']['confirm-dialog-flag'] == 'delete-bulk-payment'){
+		if(isset($form_state['input']['confirm-dialog-submit']) && ! empty($form_state['input']['confirm-dialog-submit'])){
+
+			if (isset($form_state['input']['paymentlist']))
+				if (is_array($form_state['input']['paymentlist']))
+				{
+					foreach($form_state['input']['paymentlist'] as $key => $value)
+					{
+						if (!is_null($value))
+						{
+							load_accounting_delete_payment($key, $form_state);
+
+							if(isset($form_state['storage']['payment']['list'][$key])){
+								unset($form_state['storage']['payment']['list'][$key]);
+							}
+						}
+					}
+
+					drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
+
+					return true;
+				}
+		}
+	}
+
 
 	$form_state['rebuild'] = true;
 }

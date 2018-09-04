@@ -48,16 +48,21 @@
                 $(id).modal();
             });
 
-            var modalConfirm = function(title, text, submitFlag) {
+            var modalConfirm = function(title, text, submitValue, submitFlag) {
                 $("#confirm-title").html(Drupal.t(title));
                 $("#confirm-text").html(Drupal.t(text));
-                $("#confirm-dialog-submit").attr('value',submitFlag);
+                $("#confirm-dialog-submit").attr('value', submitValue);
+                $("#confirm-dialog-flag").attr('value', submitFlag);
                 $("#confirm-dialog").modal();
             };
 
             $(".btn-delete-payment").click(function(){
                 var id = $(this).attr('data-payment-id');
-                modalConfirm('Confirmation', 'Associated loads will be set as unpaid. You cannot undo this action. Are you sure you want to delete this payment?', id);
+                modalConfirm('Confirmation', 'Associated loads will be set as unpaid. You cannot undo this action. Are you sure you want to delete this payment?', id, 'delete-payment');
+            });
+
+            $("#btn-delete-bulk-payments").click(function(){
+                modalConfirm('Confirmation', 'Associated loads will be set as unpaid. You cannot undo this action. Are you sure you want to delete these payments?', 'bulk', 'delete-bulk-payment');
             });
 
         }

@@ -162,6 +162,7 @@
             <div class="modal-body" id="confirm-text">
             </div>
             <div class="modal-footer">
+                <input type="hidden" name = 'confirm-dialog-flag' id= 'confirm-dialog-flag'>
                 <button class ="btn btn-primary" type="submit" name="confirm-dialog-submit" id="confirm-dialog-submit" value=""><?php echo t('Yes'); ?></button>
                 <button class="btn btn-default" type="button" data-dismiss="modal"><?php echo t('No'); ?></button>
             </div>

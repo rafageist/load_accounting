@@ -471,8 +471,10 @@ function customer_payments_form($form, &$form_state){
 		$form_state['storage']['payment']['list'] = [];
 	}
 
+	// get payments list
 	$payments = db_select('field_data_field_truck', 't')->fields('t', ['entity_id'])->condition('bundle', 'payment', '=')->condition('field_truck_target_id', $form_state['storage']['truck']->truck_nid, '=')->execute()->fetchAll();
 
+	
 	foreach(array_reverse($payments) as $payment){
 		$p = node_load($payment->entity_id);
 
@@ -557,7 +559,6 @@ function customer_payments_form($form, &$form_state){
 				}
 			}
 
-
 			// Form
 			$col = function($lg = 2, $md = 2, $sm = 6, $xs = 6, $classes = '', $extra = ''){
 				return "<div class=\"col col-xs-$xs col-sm-$sm col-md-$md col-lg-$lg $classes\" $extra>";
@@ -637,21 +638,21 @@ function customer_payments_form($form, &$form_state){
 					'#date_format' => 'm/d/Y H:i',
 					'#date_year_range' => '0:+1',
 					'#date_increment' => 5,
-					'#prefix' => '</div></div><div class="row">'.$col(4, 6, 12, 12),
+					'#prefix' => '</div></div><div class="row">' . $col(4, 6, 12, 12),
 					'#suffix' => '</div>'
 				],
 				'fmemo' => [
 					'#title' => 'Memo',
 					'#type' => 'textfield',
 					'#default_value' => isset($form_state['storage']['payment']['memo']) ? $form_state['storage']['payment']['memo'] : '',
-					'#prefix' => $col(6, 5,12,12),
+					'#prefix' => $col(6, 5, 12, 12),
 					'#suffix' => '</div>',
 				],
 				'fcalculate' => [
 					'#type' => 'submit',
 					'#value' => t('Save'),
 					//'#prefix' => '</div><div class="row">'.$common_col(1,1,1,1, 'col-md-offset-11 col-lg-offset-11'),
-					'#prefix' => $col(1,1,6,6,'','style="padding-top:24px;"' ),
+					'#prefix' => $col(1, 1, 6, 6, '', 'style="padding-top:24px;"'),
 					'#suffix' => '</div>',
 				],
 			];
@@ -714,8 +715,17 @@ function customer_payments_form($form, &$form_state){
 				'#header' => $form_state['storage']['payment']['header'],
 				'#options' => $form_state['storage']['payment']['list'],
 				'#empty' => t('No payment record.'),
-				'#prefix' => '<div class="panel panel-success"><div class="panel-heading"><a data-toggle="collapse" data-target="#PaymentsRecord" style="text-decoration:none; color:#3c763d; cursor:pointer;"><span class="badge">' . count($form_state['storage']['payment']['list']) . '</span><b> Payments Record</b></a></div><div id="PaymentsRecord" class="panel-collapse collapse"><div class="panel-body" style="max-height: 300px; overflow-y: scroll;">',
-				'#suffix' => '</div></div></div>',
+				'#prefix' => '<div class="panel panel-success">
+								<div class="panel-heading"><a data-toggle="collapse" data-target="#PaymentsRecord" style="text-decoration:none; color:#3c763d; cursor:pointer;"><span class="badge">' . count($form_state['storage']['payment']['list']) . '</span><b> Payments Record</b></a></div>
+									<div id="PaymentsRecord" class="panel-collapse collapse">
+										<div class="panel-body" style="max-height: 300px; overflow-y: scroll;">',
+				'#suffix' => '			</div>
+									</div>'.
+				                (count($form_state['storage']['payment']['list'])>0 ?
+								'<div class="panel-footer">
+									<a class="btn btn-danger" href="#" id="btn-delete-bulk-payments"><span class="glyphicon glyphicon-trash"></span>'.t("Delete selected payments").'</a>
+ 								</div>
+							 </div>': '')
 			],
 		];
 
