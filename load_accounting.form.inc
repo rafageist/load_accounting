@@ -474,7 +474,11 @@ function customer_payments_form($form, &$form_state){
 	// get payments list
 	$payments = db_select('field_data_field_truck', 't')->fields('t', ['entity_id'])->condition('bundle', 'payment', '=')->condition('field_truck_target_id', $form_state['storage']['truck']->truck_nid, '=')->execute()->fetchAll();
 
-	
+	$total_miles = 0;
+	$total_rates = 0;
+	$total_payments = 0;
+	$total_accessories = 0;
+	$total_total = 0;
 	foreach(array_reverse($payments) as $payment){
 		$p = node_load($payment->entity_id);
 
@@ -497,7 +501,23 @@ function customer_payments_form($form, &$form_state){
 			// 'driver' => $p->field_miles['und'][0],
 			// 'loads' => $p->field_miles['und'][0],
 		];
+
+		$total_miles += $p->field_miles['und'][0]['value'];
+		$total_rates += $p->field_rate['und'][0]['value'];
+		$total_payments += $p->field_payment['und'][0]['value'];
+		$total_accessories += $p->field_access['und'][0]['value'];
+		$total_total += $p->field_total['und'][0]['value'];
 	}
+
+	$addTotal = function(&$text, $ammount, $dollar = '$') {
+		$text .= ' <span class="gray">('.$dollar.number_format($ammount,2).')</span>';
+	};
+
+	$addTotal($form_state['storage']['payment']['header']['miles'], $total_miles, '');
+	$addTotal($form_state['storage']['payment']['header']['rate'], $total_rates/count($payments));
+	$addTotal($form_state['storage']['payment']['header']['payment'], $total_payments);
+	$addTotal($form_state['storage']['payment']['header']['accessories'], $total_accessories);
+	$addTotal($form_state['storage']['payment']['header']['total'], $total_total);
 
 	// Form
 	if( ! empty($form_state['storage']['loads'])){
