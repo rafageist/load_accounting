@@ -426,25 +426,7 @@ function customer_payments_form($form, &$form_state){
 		$form_state['storage']['loads']['header'] = get_loads_header($hide_confirmations);
 	}
 
-	// Header Payment Panels ($form_state['storage']['loads']['header'])
-	if( ! isset($form_state['storage']['payment']['header'])){
-		$form_state['storage']['payment']['header'] = [
-			'date' => t('Date'),
-			'reference' => t('Reference'),
-			'miles' => t('Miles'),
-			'rate' => t('Rate'),
-			'payment' => t('Payment'),
-			'accessories' => t('Accessories'),
-			'total' => t('Total'),
-			'memo' => t('Memo'),
-			'actions' => t('Actions')
-			// 'carrier' => t('Carrier'),
-			// 'customer' => t('Customer'),
-			// 'truck' => t('Truck'),
-			// 'driver' => t('Driver'),
-			// 'loads' => t('Loads'),
-		];
-	}
+
 
 	// Payment List ($form_state['storage']['payment']['list'])
 	if( ! isset($form_state['storage']['payment']['list'])){
@@ -481,7 +463,7 @@ function customer_payments_form($form, &$form_state){
 			'accessories' => $p->field_access['und'][0]['value'],
 			'total' => $p->field_total['und'][0]['value'],
 			'memo' => $p->field_memo['und'][0]['value'],
-			'actions' => '<a class="btn btn-danger btn-delete-payment" href="#" data-payment-id = "' . $payment->entity_id . '"><span class="glyphicon glyphicon-trash"></span></a>'.$upload_link
+			'actions' => '<a class="btn btn-danger btn-delete-payment" href="#" data-payment-id = "' . $payment->entity_id . '"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;'.$upload_link
 
 			// 'carrier' => $p->field_miles['und'][0],
 			// 'customer' => $p->field_miles['und'][0],
@@ -497,18 +479,28 @@ function customer_payments_form($form, &$form_state){
 		$total_total += $p->field_total['und'][0]['value'];
 	}
 
-	$addTotal = function(&$text, $ammount, $dollar = '$') {
-		$span = '<span class="gray">';
-		$pos = strpos($text, $span);
-		if ( $pos !== false) $text = substr($text, 0, $pos);
-		$text .= ' '.$span.'('.$dollar.number_format($ammount,2).')</span>';
-	};
+	// modify headers
+	$addTotal = function($header_text, $amount, $dollar = '$') { return t($header_text).' <span class="gray">('.$dollar.number_format($amount,2).')</span>'; };
 
-	$addTotal($form_state['storage']['payment']['header']['miles'], $total_miles, '');
-	$addTotal($form_state['storage']['payment']['header']['rate'], $total_rates/count($payments));
-	$addTotal($form_state['storage']['payment']['header']['payment'], $total_payments);
-	$addTotal($form_state['storage']['payment']['header']['accessories'], $total_accessories);
-	$addTotal($form_state['storage']['payment']['header']['total'], $total_total);
+	// Header Payment Panels ($form_state['storage']['loads']['header'])
+	if( ! isset($form_state['storage']['payment']['header'])){
+		$form_state['storage']['payment']['header'] = [
+			'date' => t('Date'),
+			'reference' => t('Reference'),
+			'miles' => $addTotal('Miles', $total_miles, ''),
+			'rate' => $addTotal('Rate', $total_rates/count($payments)),
+			'payment' => $addTotal('Payment', $total_payments),
+			'accessories' => $addTotal('Accessories', $total_accessories),
+			'total' => $addTotal('Total', $total_total),
+			'memo' => t('Memo'),
+			'actions' => ''
+			// 'carrier' => t('Carrier'),
+			// 'customer' => t('Customer'),
+			// 'truck' => t('Truck'),
+			// 'driver' => t('Driver'),
+			// 'loads' => t('Loads'),
+		];
+	}
 
 	// Form
 	if( ! empty($form_state['storage']['loads'])){
