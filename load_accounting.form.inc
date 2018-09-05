@@ -463,7 +463,16 @@ function customer_payments_form($form, &$form_state){
 			'accessories' => $p->field_access['und'][0]['value'],
 			'total' => $p->field_total['und'][0]['value'],
 			'memo' => $p->field_memo['und'][0]['value'],
-			'actions' => '<a class="btn btn-danger btn-delete-payment" href="#" data-payment-id = "' . $payment->entity_id . '"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;'.$upload_link
+			'actions' => '<a class="btn btn-default btn-edit-payment" href="#" 
+							data-payment-id = "' . $payment->entity_id . '"
+							data-payment-miles = "' . $p->field_miles['und'][0]['value'] . '"
+							data-payment-payment = "' . $p->field_payment['und'][0]['value'] . '"
+							data-payment-accessories = "' . $p->field_access['und'][0]['value'] . '"
+							data-payment-memo = "' . str_replace('"',' ',$p->field_memo['und'][0]['value']). '"
+							data-payment-reference = "' . $p->title. '">
+							<span class="glyphicon glyphicon-pencil"></span></a>&nbsp;'.
+						'<a class="btn btn-danger btn-delete-payment" href="#" data-payment-id = "' . $payment->entity_id . '"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;'.
+			             $upload_link
 
 			// 'carrier' => $p->field_miles['und'][0],
 			// 'customer' => $p->field_miles['und'][0],

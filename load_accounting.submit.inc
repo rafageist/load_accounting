@@ -183,13 +183,10 @@ function customer_payments_form_submit($form, &$form_state){
 	if(isset($form_state['input']['confirm-dialog-flag']) && $form_state['input']['confirm-dialog-flag'] == 'delete-bulk-payment'){
 		if(isset($form_state['input']['confirm-dialog-submit']) && ! empty($form_state['input']['confirm-dialog-submit'])){
 
-			if (isset($form_state['input']['paymentlist']))
-				if (is_array($form_state['input']['paymentlist']))
-				{
-					foreach($form_state['input']['paymentlist'] as $key => $value)
-					{
-						if (!is_null($value))
-						{
+			if(isset($form_state['input']['paymentlist'])){
+				if(is_array($form_state['input']['paymentlist'])){
+					foreach($form_state['input']['paymentlist'] as $key => $value){
+						if( ! is_null($value)){
 							load_accounting_delete_payment($key, $form_state);
 
 							if(isset($form_state['storage']['payment']['list'][$key])){
@@ -202,6 +199,38 @@ function customer_payments_form_submit($form, &$form_state){
 
 					return true;
 				}
+			}
+		}
+	}
+
+	if(isset($form_state['input']['btn-update-payment']) && $form_state['input']['btn-update-payment'] == "update-payment"){
+		$payment = node_load($form_state['input']['payment-id']);
+
+		if($payment !== false){
+			$current_payment = serialize($payment);
+			$payment->field_miles['und'][0]['value'] = $form_state['input']['payment-miles'];
+			$payment->field_access['und'][0]['value'] = $form_state['input']['payment-accessories'];
+			$payment->field_payment['und'][0]['value'] = $form_state['input']['payment-payment'];
+
+			if($current_payment != serialize($payment)){
+				$payment->field_total['und'][0]['value'] = round($payment->field_payment['und'][0]['value'] + $payment->field_access['und'][0]['value'], 2);
+				$payment->field_rate['und'][0]['value'] = round($payment->field_total['und'][0]['value'] / $payment->field_miles['und'][0]['value'], 2);
+			}
+
+			$payment->field_memo['und'][0]['value'] = $form_state['input']['payment-memo'];
+			if($current_payment != serialize($payment)){
+				try{
+					node_save($payment);
+				} catch(Exception $e){
+
+				}
+
+				drupal_set_message("Payment #{$payment->title} was updated successful");
+
+				drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
+
+				return true;
+			}
 		}
 	}
 

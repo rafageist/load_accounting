@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @file
+ * Load accounting install script
+ */
+
+/**
+ * Implements hook_install
+ */
 function load_accounting_install(){
 
 	// field_payment_date field
@@ -30,7 +38,6 @@ function load_accounting_install(){
 		} catch(FieldException $e){
 		}
 	}
-
 
 	$instance = [
 		'label' => 'Payment Date',

@@ -169,3 +169,63 @@
         </div>
     </div>
 </div>
+
+<!-- payment edit form -->
+<div role="dialog" tabindex="-1" class="modal fade in" id="payment-edit-form">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 id="payment-reference" class="modal-title">Payment #</h4></div>
+            <div class="modal-body">
+                <input type="hidden" name="payment-id" class="form-control" id="payment-id" />
+                <div class="row">
+                    <div class="col col-lg-6">
+                        <div class="form-group">
+                            <label for="payment-miles" class="control-label"><?php echo t('Miles'); ?>: </label>
+                            <input type="text" name="payment-miles" class="form-control" id="payment-miles" />
+                        </div>
+                    </div>
+                    <div class="col col-lg-6">
+                        <div class="form-group">
+                            <label for="payment-payment" class="control-label"><?php echo t('Payment'); ?>: </label>
+                            <input type="text" name="payment-payment" class="form-control" id="payment-payment" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-lg-6">
+                        <div class="form-group">
+                            <label for="payment-accessories" class="control-label"><?php echo t('Accessories'); ?>:</label>
+                            <input type="text" name="payment-accessories" class="form-control" id="payment-accessories" />
+                        </div>
+                    </div>
+                    <div class="col col-lg-6">
+                        <div class="form-group">
+                            <label for="payment-memo" class="control-label"><?php echo t('Memo'); ?>: </label>
+                            <input type="text" name="payment-memo" class="form-control" id="payment-memo"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-lg-6">
+                        <div class="form-group">
+                            <label for="payment-total" class="control-label"><?php echo t('Total'); ?>: </label>
+                            <input type="text" disabled="true" name="payment-total" class="form-control" id="payment-total"/>
+                        </div>
+                    </div>
+                    <div class="col col-lg-6">
+                        <div class="form-group">
+                            <label for="payment-rate" class="control-label"><?php echo t('Rate'); ?>: </label>
+                            <input type="text" disabled="true" name="payment-rate" class="form-control" id="payment-rate"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-primary" type="submit" name="btn-update-payment" value="update-payment">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
