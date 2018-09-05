@@ -10,30 +10,38 @@ function load_accounting_menu(){
 	$items = [];
 
 	$items['accounting/customer/trucks'] = [
-		'title'            => t('Customer Trucks'),
-		'page callback'    => 'drupal_get_form',
-		'page arguments'   => ['customer_trucks_form'],
-		'access callback'  => 'user_access',
+		'title' => t('Customer Trucks'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => ['customer_trucks_form'],
+		'access callback' => 'user_access',
 		'access arguments' => ['access customer trucks'],
-		'type'             => MENU_NORMAL_ITEM,
+		'type' => MENU_NORMAL_ITEM,
 	];
 
 	$items['accounting/customer/reports/%'] = [
-		'title'            => t('Truck Report'),
-		'page callback'    => 'drupal_get_form',
-		'page arguments'   => ['customer_reports_form'],
-		'access callback'  => 'user_access',
+		'title' => t('Truck Report'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => ['customer_reports_form'],
+		'access callback' => 'user_access',
 		'access arguments' => ['access customer reports'],
-		'type'             => MENU_NORMAL_ITEM,
+		'type' => MENU_NORMAL_ITEM,
 	];
 
 	$items['accounting/customer/payments/%'] = [
-		'title'            => t('Truck Payments'),
-		'page callback'    => 'drupal_get_form',
-		'page arguments'   => ['customer_payments_form'],
-		'access callback'  => 'user_access',
+		'title' => t('Truck Payments'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => ['customer_payments_form'],
+		'access callback' => 'user_access',
 		'access arguments' => ['access customer payments'],
-		'type'             => MENU_NORMAL_ITEM,
+		'type' => MENU_NORMAL_ITEM,
+	];
+
+	$items['accounting/%ctools_js/payment_loads/%'] = [
+		'title' => 'Payment\'s Loads',
+		'page callback' => 'load_accounting_payment_loads',
+		'page arguments' => [1, 3],
+		'access callback' => true,
+		'type' => MENU_CALLBACK,
 	];
 
 	return $items;
@@ -45,16 +53,16 @@ function load_accounting_menu(){
  */
 function load_accounting_permission(){
 	return [
-		'access customer trucks'   => [
-			'title'       => t('Access Customer Trucks Page'),
+		'access customer trucks' => [
+			'title' => t('Access Customer Trucks Page'),
 			'description' => t('Give access to customer role.'),
 		],
-		'access customer reports'  => [
-			'title'       => t('Access Customer Reports Page'),
+		'access customer reports' => [
+			'title' => t('Access Customer Reports Page'),
 			'description' => t('Give access to customer role.'),
 		],
 		'access customer payments' => [
-			'title'       => t('Access Customer Payments Page'),
+			'title' => t('Access Customer Payments Page'),
 			'description' => t('Give access to customer role.'),
 		],
 	];
@@ -65,27 +73,27 @@ function load_accounting_permission(){
  */
 function load_accounting_theme(){
 	return [
-		'my_trucks'          => [
-			'template'  => 'my-trucks',
+		'my_trucks' => [
+			'template' => 'my-trucks',
 			'variables' => [
 				'report' => null,
 				'trucks' => null,
 			],
 		],
-		'truck_profile'      => [
-			'template'  => 'truck-profile',
+		'truck_profile' => [
+			'template' => 'truck-profile',
 			'variables' => [
 				'truck' => null,
 			],
 		],
-		'comparison_report'  => [
-			'template'  => 'comparison-report',
+		'comparison_report' => [
+			'template' => 'comparison-report',
 			'variables' => [
 				'report' => null,
 			],
 		],
-		'load_record'        => [
-			'template'  => 'load-record',
+		'load_record' => [
+			'template' => 'load-record',
 			'variables' => [
 				'loads' => null,
 			],
@@ -108,28 +116,28 @@ function theme_file_link_extended($variables){
 
 	// Human-readable names, for use as text-alternatives to icons.
 	$mime_name = [
-		'application/msword'            => t('Microsoft Office document icon'),
-		'application/vnd.ms-excel'      => t('Office spreadsheet icon'),
+		'application/msword' => t('Microsoft Office document icon'),
+		'application/vnd.ms-excel' => t('Office spreadsheet icon'),
 		'application/vnd.ms-powerpoint' => t('Office presentation icon'),
-		'application/pdf'               => t('PDF icon'),
-		'video/quicktime'               => t('Movie icon'),
-		'audio/mpeg'                    => t('Audio icon'),
-		'audio/wav'                     => t('Audio icon'),
-		'image/jpeg'                    => t('Image icon'),
-		'image/png'                     => t('Image icon'),
-		'image/gif'                     => t('Image icon'),
-		'application/zip'               => t('Package icon'),
-		'text/html'                     => t('HTML icon'),
-		'text/plain'                    => t('Plain text icon'),
-		'application/octet-stream'      => t('Binary Data'),
+		'application/pdf' => t('PDF icon'),
+		'video/quicktime' => t('Movie icon'),
+		'audio/mpeg' => t('Audio icon'),
+		'audio/wav' => t('Audio icon'),
+		'image/jpeg' => t('Image icon'),
+		'image/png' => t('Image icon'),
+		'image/gif' => t('Image icon'),
+		'application/zip' => t('Package icon'),
+		'text/html' => t('HTML icon'),
+		'text/plain' => t('Plain text icon'),
+		'application/octet-stream' => t('Binary Data'),
 	];
 
 	$mimetype = file_get_mimetype($file->uri);
 
 	$icon = theme('file_icon', [
-		'file'           => $file,
+		'file' => $file,
 		'icon_directory' => $icon_directory,
-		'alt'            => ! empty($mime_name[$mimetype]) ? $mime_name[$mimetype] : t('File'),
+		'alt' => ! empty($mime_name[$mimetype]) ? $mime_name[$mimetype] : t('File'),
 	]);
 
 	// Set options as per anchor format described at
@@ -154,4 +162,62 @@ function theme_file_link_extended($variables){
 	}
 
 	return '<span class="file">' . $icon . ' ' . l($link_text, $url, $options) . '</span>';
+}
+
+function load_accounting_payment_loads($js, $payment_id){
+
+	if($js){
+
+		ctools_include('ajax');
+		ctools_include('modal');
+
+		$form_info = [];
+		$payment = node_load($payment_id);
+		$loads = [];
+
+		if(isset($payment->field_loads['und'])){
+
+			$targets = $payment->field_loads['und'];
+
+			if(is_array($targets)){
+				foreach($targets as $target){
+					$lid = $target['target_id'];
+
+					$values = db_select('truck_dataset_loads', 't')->fields('t')->condition('load_nid', $lid, '=')->orderBy('load_created', 'ASC')->execute()->fetchAll();
+					$value = $values[0];
+					$loadx = [
+						'nid' => $value->load_nid,
+						'title' => $value->load_title,
+						'status' => $value->load_status,
+						'created' => $value->load_created,
+						'miles' => $value->load_miles,
+						'empty' => $value->load_empty,
+						'rate' => $value->load_rate,
+						'payment' => $value->load_payment,
+						'uid' => $value->load_author_uid,
+						'uname' => $value->load_author_user,
+						'ufull' => $value->load_author_full,
+						'trucknid' => $value->truck_nid,
+					];
+
+					$load = get_load_data($loadx,$is_paid);
+					unset($load['upload']);
+
+					$loads[$load['nid']] = $load;
+				}
+			}
+		}
+
+		$output = '';
+
+		try{
+			$output = theme('table', array('header' => get_loads_header(false), 'rows' => $loads));
+		} catch(Exception $exception)
+		{
+
+		}
+
+		ctools_modal_render('Loads', $output);
+	}
+
 }

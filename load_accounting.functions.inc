@@ -513,3 +513,28 @@ function load_accounting_delete_payment($payment_id, &$form_state){
 
 	return true;
 }
+
+function get_loads_header($hide_confirmations = false)
+{
+	$loads_header = [
+		'title' => t('4G ID'),
+		'miles' => t('Miles'),
+		'empty' => t('Empty'),
+		'payment' => t('Payment'),
+		'rate' => t('Rate'),
+		'from' => t('From'),
+		'to' => t('To'),
+		'delivery' => t('Delivery Date'),
+		'created' => t('Created'),
+		'dispatcher' => t('Dispatcher'),
+	];
+
+	if( ! $hide_confirmations){
+		$loads_header['confirmation'] = t('Confirmation');
+	}
+
+	$loads_header['bol'] = t('BOL');
+	$loads_header['upload'] = '';
+
+	return $loads_header;
+}

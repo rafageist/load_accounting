@@ -423,27 +423,7 @@ function customer_payments_form($form, &$form_state){
 
 	// Header Load Panels ($form_state['storage']['loads']['header'])
 	if( ! isset($form_state['storage']['loads']['header'])){
-		$loads_header = [
-			'title' => t('4G ID'),
-			'miles' => t('Miles'),
-			'empty' => t('Empty'),
-			'payment' => t('Payment'),
-			'rate' => t('Rate'),
-			'from' => t('From'),
-			'to' => t('To'),
-			'delivery' => t('Delivery Date'),
-			'created' => t('Created'),
-			'dispatcher' => t('Dispatcher'),
-		];
-
-		if( ! $hide_confirmations){
-			$loads_header['confirmation'] = t('Confirmation');
-		}
-
-		$loads_header['bol'] = t('BOL');
-		$loads_header['upload'] = '';
-
-		$form_state['storage']['loads']['header'] = $loads_header;
+		$form_state['storage']['loads']['header'] = get_loads_header($hide_confirmations);
 	}
 
 	// Header Payment Panels ($form_state['storage']['loads']['header'])
@@ -485,6 +465,13 @@ function customer_payments_form($form, &$form_state){
 		$paymentdate = isset($p->field_payment_date['und'][0]['value']) ? strtotime($p->field_payment_date['und'][0]['value']) : $p->created;
 		$paymentdate = date('m/d/Y H:i', $paymentdate);
 
+		ctools_include('ajax');
+		ctools_include('modal');
+
+		ctools_modal_add_js();
+
+		$upload_link = ctools_ajax_text_button(t('Loads'), 'accounting/nojs/payment_loads/' . $payment->entity_id, t('View loads'),'btn btn-info');
+
 		$form_state['storage']['payment']['list'][$payment->entity_id] = [
 			'date' => $paymentdate,
 			'reference' => $p->title,
@@ -494,7 +481,8 @@ function customer_payments_form($form, &$form_state){
 			'accessories' => $p->field_access['und'][0]['value'],
 			'total' => $p->field_total['und'][0]['value'],
 			'memo' => $p->field_memo['und'][0]['value'],
-			'actions' => '<a class="btn btn-danger btn-delete-payment" href="#" data-payment-id = "' . $payment->entity_id . '"><span class="glyphicon glyphicon-trash"></span></a>'
+			'actions' => '<a class="btn btn-danger btn-delete-payment" href="#" data-payment-id = "' . $payment->entity_id . '"><span class="glyphicon glyphicon-trash"></span></a>'.$upload_link
+
 			// 'carrier' => $p->field_miles['und'][0],
 			// 'customer' => $p->field_miles['und'][0],
 			// 'truck' => $p->field_miles['und'][0],
@@ -510,7 +498,10 @@ function customer_payments_form($form, &$form_state){
 	}
 
 	$addTotal = function(&$text, $ammount, $dollar = '$') {
-		$text .= ' <span class="gray">('.$dollar.number_format($ammount,2).')</span>';
+		$span = '<span class="gray">';
+		$pos = strpos($text, $span);
+		if ( $pos !== false) $text = substr($text, 0, $pos);
+		$text .= ' '.$span.'('.$dollar.number_format($ammount,2).')</span>';
 	};
 
 	$addTotal($form_state['storage']['payment']['header']['miles'], $total_miles, '');
