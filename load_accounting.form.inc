@@ -493,11 +493,12 @@ function customer_payments_form($form, &$form_state){
 
 	// Header Payment Panels ($form_state['storage']['loads']['header'])
 	if( ! isset($form_state['storage']['payment']['header'])){
+		$count_payments = count($payments);
 		$form_state['storage']['payment']['header'] = [
 			'date' => t('Date'),
 			'reference' => t('Reference'),
 			'miles' => $addTotal('Miles', $total_miles, ''),
-			'rate' => $addTotal('Rate', $total_rates/count($payments)),
+			'rate' => $addTotal('Rate', $count_payments > 0 ? $total_rates / $count_payments: 0),
 			'payment' => $addTotal('Payment', $total_payments),
 			'accessories' => $addTotal('Accessories', $total_accessories),
 			'total' => $addTotal('Total', $total_total),
