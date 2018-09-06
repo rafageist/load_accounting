@@ -40,6 +40,12 @@ function load_accounting_install(){
 		}
 	}
 
+	try{
+		field_update_field($field);
+	} catch(FieldException $e){
+
+	}
+
 	$instance = [
 		'label' => 'Payment Date',
 		'widget' => [
@@ -93,5 +99,11 @@ function load_accounting_install(){
 			field_create_instance($instance);
 		} catch(FieldException $e){
 		}
+	}
+
+	try{
+		field_update_instance($instance);
+	} catch(FieldException $e){
+
 	}
 }
