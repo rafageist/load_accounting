@@ -359,7 +359,7 @@ function customer_payments_form($form, &$form_state){
 				if(isset($form_state['input']['driver-compensation-type'])){
 					$comp_type = $form_state['input']['driver-compensation-type'];
 					if($form_state['submitted']){
-						drupal_set_message('The compensation type was updated as <i>' . $comp_type . '</i>');
+						drupal_set_message('The compensation type has been successfully updated as <i>' . $comp_type . '</i>');
 					}
 				}
 
@@ -371,7 +371,7 @@ function customer_payments_form($form, &$form_state){
 				if(isset($form_state['input']['driver-compensation-value'])){
 					$comp_value = $form_state['input']['driver-compensation-value'] * 1;
 					if($form_state['submitted']){
-						drupal_set_message('The compensation value was updated as <i>' . $comp_value . '</i>');
+						drupal_set_message('The compensation value has been successfully updated as <i>' . $comp_value . '</i>');
 					}
 				}
 
@@ -469,7 +469,8 @@ function customer_payments_form($form, &$form_state){
 							data-payment-payment = "' . $p->field_payment['und'][0]['value'] . '"
 							data-payment-accessories = "' . $p->field_access['und'][0]['value'] . '"
 							data-payment-memo = "' . str_replace('"',' ',$p->field_memo['und'][0]['value']). '"
-							data-payment-reference = "' . $p->title. '">
+							data-payment-reference = "' . $p->title. '"
+							data-payment-date = "' . date('m/d/Y', strtotime($p->field_payment_date['und'][0]['value'])). '">
 							<span class="glyphicon glyphicon-pencil"></span></a>&nbsp;'.
 						'<a class="btn btn-danger btn-delete-payment" href="#" data-payment-id = "' . $payment->entity_id . '"><span class="glyphicon glyphicon-trash"></span></a>&nbsp;'.
 			             $upload_link
@@ -743,6 +744,12 @@ function customer_payments_form($form, &$form_state){
 			],
 		];
 
+		// Force Drupal to load datepopup jquery library
+		$form['load_datepopup'] = [
+			'#type' => 'date_popup',
+			'#prefix' => '<div class="hidden">',
+			'#suffix' => '</div>'
+		];
 
 		return $form;
 	}

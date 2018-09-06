@@ -209,6 +209,20 @@
                 </div>
                 <div class="row">
                     <div class="col col-lg-6">
+                        <div class="container-inline-date">
+                            <div class="form-item form-item-payment-date form-type-date-popup form-group">
+                                <label class="control-label" for="payment-date">Payment Date: </label>
+                                <div id="edit-payment-date" class="date-padding">
+                                    <div class="form-item form-item-payment-date form-type-textfield form-group">
+                                        <input class="form-control form-text" id="payment-date" name="payment-date" value="09/06/2018" size="20" maxlength="30" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-lg-6">
                         <div class="form-group">
                             <label for="payment-total" class="control-label"><?php echo t('Total'); ?>: </label>
                             <input type="text" disabled="true" name="payment-total" class="form-control" id="payment-total"/>

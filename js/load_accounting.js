@@ -91,6 +91,7 @@ var number_format = function (number, decimals, dec_point, thousands_sep) {
                 var payment = $(this).attr('data-payment-payment') * 1;
                 var memo = $(this).attr('data-payment-memo');
                 var accessories = $(this).attr('data-payment-accessories') * 1;
+                var date = $(this).attr('data-payment-date');
 
                 $("#payment-edit-form").modal();
                 $("#payment-id").val(id);
@@ -98,6 +99,7 @@ var number_format = function (number, decimals, dec_point, thousands_sep) {
                 $("#payment-payment").val(payment);
                 $("#payment-accessories").val(accessories);
                 $("#payment-memo").val(memo);
+                $("#payment-date").val(date);
 
                 var updatePaymentValues = function()
                 {
@@ -122,6 +124,58 @@ var number_format = function (number, decimals, dec_point, thousands_sep) {
                 $("#payment-accessories").keyup(updatePaymentValues);
 
                 updatePaymentValues();
+
+                function makeFocusHandler(e) {
+                    if (!$(this).hasClass('date-popup-init')) {
+                        var datePopup = e.data;
+
+                        switch (datePopup.func) {
+                            case 'datepicker':
+                                $(this)
+                                    .datepicker(datePopup.settings)
+                                    .addClass('date-popup-init');
+                                    $(this).click(function(){
+                                        $(this).focus();
+                                    });
+                                break;
+                        }
+                    }
+                }
+
+               /* $('#payment-date').bind('focus', {
+                    autoPopup: "focus",
+                    changeMonth: true,
+                    changeYear: true,
+                    closeAtTop: false,
+                    dateFormat: "mm/dd/yy",
+                    defaultDate: "0y",
+                    firstDate: 0,
+                    fromTo: false,
+                    speed: "immediate",
+                    yearRange: "+0:+1"
+                }, makeFocusHandler);*/
+
+                $('#payment-date').focus(function(e){
+                    $(this)
+                        .datepicker({
+                            autoPopup: "focus",
+                            changeMonth: true,
+                            changeYear: true,
+                            closeAtTop: false,
+                            dateFormat: "mm/dd/yy",
+                            defaultDate: "0y",
+                            firstDate: 0,
+                            fromTo: false,
+                            speed: "immediate",
+                            yearRange: "+0:+1",
+                            value: date
+                        })
+                        .addClass('date-popup-init');
+
+                        $(this).click(function(){
+                            $(this).focus();
+                        });
+                });
             });
         }
     };

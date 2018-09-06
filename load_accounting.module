@@ -216,8 +216,6 @@ function load_accounting_payment_loads($js, $payment_id){
 		{
 
 		}
-
 		ctools_modal_render('Loads', $output);
 	}
-
 }

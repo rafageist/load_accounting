@@ -21,6 +21,7 @@ function customer_reports_form_submit($form, &$form_state){
 function customer_payments_form_submit($form, &$form_state){
 
 	global $user;
+
 	// SET LOADS AS PAID
 	if($form_state['values']['op'] == 'Set As Paid'){
 		$form_state['storage']['payment']['place'] = 0;
@@ -29,14 +30,24 @@ function customer_payments_form_submit($form, &$form_state){
 			if($value != 0){
 				$node = node_load($value);
 				$node->field_paid['und'][0]['value'] = 1;
-				node_save($node);
+
+				try{
+					node_save($node);
+				} catch(Exception $e){
+					drupal_set_message('Internal error when setting the load as paid: ' . $e->getMessage(), 'error');
+				}
+
 				$count ++;
 				$form_state['storage']['loads']['paid'][$value] = $form_state['storage']['loads']['pending'][$value];
 				unset($form_state['storage']['loads']['pending'][$value]);
 			}
 		}
+
 		drupal_set_message(t('Loads (' . $count . ') set as paid.'), 'status');
-	} // SET LOADS AS PENDING
+
+	}
+
+	// SET LOADS AS PENDING
 	elseif($form_state['values']['op'] == 'Set As Pending'){
 		$form_state['storage']['payment']['place'] = 0;
 		$count = 0;
@@ -44,14 +55,22 @@ function customer_payments_form_submit($form, &$form_state){
 			if($value != 0){
 				$node = node_load($value);
 				$node->field_paid['und'][0]['value'] = 0;
-				node_save($node);
+
+				try{
+					node_save($node);
+				} catch(Exception $e){
+					drupal_set_message('Internal error when setting the load as pending: ' . $e->getMessage(), 'error');
+				}
+
 				$count ++;
 				$form_state['storage']['loads']['pending'][$value] = $form_state['storage']['loads']['paid'][$value];
 				unset($form_state['storage']['loads']['paid'][$value]);
 			}
 		}
 		drupal_set_message(t('Loads (' . $count . ') set as pending.'), 'status');
-	} // PLACE PAYMENT FORM
+	}
+
+	// PLACE PAYMENT FORM
 	elseif($form_state['values']['op'] == 'Make Payment'){
 		$form_state['storage']['payment']['place'] = 1;
 		$form_state['storage']['payment']['miles'] = 10;
@@ -82,7 +101,6 @@ function customer_payments_form_submit($form, &$form_state){
 				}
 
 				$count ++;
-
 				$sumToMiles += $node->field_total_miles['und'][0]['value'];
 			}
 		}
@@ -123,7 +141,12 @@ function customer_payments_form_submit($form, &$form_state){
 			default:
 				break;
 		}
-	} // REGISTER PAYMENT
+
+		$form_state['rebuild'] = true;
+		return true; // important !!
+	}
+
+	// REGISTER PAYMENT
 	elseif($form_state['values']['op'] == 'Save'){
 		$form_state['storage']['payment']['place'] = 0;
 		$entity = entity_create('node', ['type' => 'payment']);
@@ -161,6 +184,7 @@ function customer_payments_form_submit($form, &$form_state){
 		}
 	}
 
+	// upload new bol
 	load_accounting_upload_bol($form_state, 'accounting/customer/payments');
 
 	// delete a payment before load payments
@@ -172,10 +196,6 @@ function customer_payments_form_submit($form, &$form_state){
 			if(isset($form_state['storage']['payment']['list'][$payment_id])){
 				unset($form_state['storage']['payment']['list'][$payment_id]);
 			}
-
-			drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
-
-			return true;
 		}
 	}
 
@@ -194,46 +214,45 @@ function customer_payments_form_submit($form, &$form_state){
 							}
 						}
 					}
-
-					drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
-
-					return true;
 				}
 			}
 		}
 	}
 
+	// update payment
 	if(isset($form_state['input']['btn-update-payment']) && $form_state['input']['btn-update-payment'] == "update-payment"){
-		$payment = node_load($form_state['input']['payment-id']);
+		$payment = entity_load_single('node', $form_state['input']['payment-id']);
 
 		if($payment !== false){
-			$current_payment = serialize($payment);
-			$payment->field_miles['und'][0]['value'] = $form_state['input']['payment-miles'];
-			$payment->field_access['und'][0]['value'] = $form_state['input']['payment-accessories'];
-			$payment->field_payment['und'][0]['value'] = $form_state['input']['payment-payment'];
+
+			$wrap = entity_metadata_wrapper('node', $payment);
+			$current_payment = serialize($wrap);
+			$wrap->field_miles->set(round($form_state['input']['payment-miles'], 2));
+			$wrap->field_access->set(round($form_state['input']['payment-accessories'], 2));
+			$wrap->field_payment->set(round($form_state['input']['payment-payment'], 2));
+			$wrap->field_payment_date->set(strtotime($form_state['input']['payment-date']));
 
 			if($current_payment != serialize($payment)){
-				$payment->field_total['und'][0]['value'] = round($payment->field_payment['und'][0]['value'] + $payment->field_access['und'][0]['value'], 2);
-				$payment->field_rate['und'][0]['value'] = round($payment->field_total['und'][0]['value'] / $payment->field_miles['und'][0]['value'], 2);
-			}
+				$wrap->field_total->set(round($payment->field_payment['und'][0]['value'] + $payment->field_access['und'][0]['value'], 2));
+				$wrap->field_rate->set(round($payment->field_total['und'][0]['value'] / $payment->field_miles['und'][0]['value'], 2));
 
-			$payment->field_memo['und'][0]['value'] = $form_state['input']['payment-memo'];
+			}
+			$wrap->field_memo->set($form_state['input']['payment-memo']);
+
 			if($current_payment != serialize($payment)){
 				try{
-					node_save($payment);
+					$wrap->save();
 				} catch(Exception $e){
-
+					drupal_set_message("Error when saving the payment: " . $e->getMessage(), "error");
 				}
 
-				drupal_set_message("Payment #{$payment->title} was updated successful");
-
-				drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
-
-				return true;
+				drupal_set_message("Payment #{$payment->title} has been successfully updated");
 			}
 		}
 	}
 
-
 	$form_state['rebuild'] = true;
+
+	drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
+	return true;
 }

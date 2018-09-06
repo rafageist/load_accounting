@@ -260,7 +260,7 @@ function load_accounting_save_truck_nickname(&$form_state){
 				$truck = node_load($form_state['storage']['truck']->truck_nid);
 				$truck->field_nickname['und'][0]['value'] = $form_state['input']['truck-nickname'];
 				node_save($truck);
-				drupal_set_message('Truck nick name was updated as <i>' . $form_state['input']['truck-nickname'] . '</i>');
+				drupal_set_message('Truck nick name has been successfully updated as <i>' . $form_state['input']['truck-nickname'] . '</i>');
 			}
 		}
 	}
