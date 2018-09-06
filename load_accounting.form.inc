@@ -736,7 +736,7 @@ function customer_payments_form($form, &$form_state){
 									</div>'.
 				                (count($form_state['storage']['payment']['list'])>0 ?
 								'<div class="panel-footer">
-									<a class="btn btn-danger" href="#" id="btn-delete-bulk-payments"><span class="glyphicon glyphicon-trash"></span>'.t("Delete selected payments").'</a>
+									<a class="btn btn-danger" href="#" id="btn-delete-bulk-payments"><span class="glyphicon glyphicon-trash"></span>&nbsp;'.t("Delete selected payments").'</a>
  								</div>
 							 </div>': '')
 			],
