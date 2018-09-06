@@ -16,9 +16,9 @@ function load_accounting_install(){
 			'granularity' => [
 				'month' => 'month',
 				'day' => 'day',
-				'hour' => 'hour',
-				'minute' => 'minute',
 				'year' => 'year',
+				'hour' => 0,
+				'minute' => 0,
 				'second' => 0,
 			],
 			'tz_handling' => 'none',
@@ -31,6 +31,7 @@ function load_accounting_install(){
 		'type' => 'datetime',
 		'cardinality' => '1',
 	];
+
 
 	if(field_info_field($field['field_name']) === null){
 		try{

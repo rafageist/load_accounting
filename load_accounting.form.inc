@@ -573,7 +573,7 @@ function customer_payments_form($form, &$form_state){
 			}
 
 			// Form
-			$col = function($lg = 2, $md = 2, $sm = 6, $xs = 6, $classes = '', $extra = ''){
+			$col = function($lg = 1, $md = 1, $sm = 12, $xs = 12, $classes = '', $extra = ''){
 				return "<div class=\"col col-xs-$xs col-sm-$sm col-md-$md col-lg-$lg $classes\" $extra>";
 			};
 
@@ -644,21 +644,22 @@ function customer_payments_form($form, &$form_state){
 					'#suffix' => '</div>'
 				],
 				'fpaymentdate' => [
-					'#title' => t('Scheduled') . ": ",
+					'#title' => t('Payment Date') . ": ",
 					'#label_position' => 'above',
 					'#date_label_position' => 'hidden',
 					'#type' => 'date_popup',
-					'#date_format' => 'm/d/Y H:i',
+					'#date_format' => 'm/d/Y',
+					'#default_value' => date("Y-m-d"),
 					'#date_year_range' => '0:+1',
 					'#date_increment' => 5,
-					'#prefix' => '</div></div><div class="row">' . $col(4, 6, 12, 12),
+					'#prefix' => $col(2, 2, 12, 12),
 					'#suffix' => '</div>'
 				],
 				'fmemo' => [
 					'#title' => 'Memo',
 					'#type' => 'textfield',
 					'#default_value' => isset($form_state['storage']['payment']['memo']) ? $form_state['storage']['payment']['memo'] : '',
-					'#prefix' => $col(6, 5, 12, 12),
+					'#prefix' => $col(3, 3, 12, 12),
 					'#suffix' => '</div>',
 				],
 				'fcalculate' => [

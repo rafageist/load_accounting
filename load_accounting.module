@@ -203,7 +203,7 @@ function load_accounting_payment_loads($js, $payment_id){
 					$load = get_load_data($loadx,$is_paid);
 					unset($load['upload']);
 
-					$loads[$load['nid']] = $load;
+					$loads[] = $load;
 				}
 			}
 		}
