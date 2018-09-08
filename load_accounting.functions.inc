@@ -467,21 +467,31 @@ function load_accounting_upload_bol(&$form_state, $redirect){
 /**
  * Check app bonus from $form_state
  *
- * @param $form_state
- *
  * @return bool
  */
-function is_app_bonus($form_state){
-	$app_bonus = false;
-	if(isset($form_state['storage']['truck']->customer_nid)){
-		$customer = node_load($form_state['storage']['truck']->customer_nid);
-		if(isset($customer->field_appbonus['und'][0]['value']) && intval($customer->field_appbonus['und'][0]['value']) == 1) // important, use the IF!!
-		{
-			$app_bonus = true;
-		}
+function is_app_bonus(){
+
+	global $user;
+	$usr = user_load($user->uid);
+
+	if (isset($usr->field_appbonus['und'][0]['value']) && intval($usr->field_appbonus['und'][0]['value']) == 1)
+		return true;
+
+	if (isset($usr->field_customer['und'][0]['target_id']))
+	{
+		$customer = node_load($usr->field_customer['und'][0]['target_id']);
+		if(isset($customer->field_appbonus['und'][0]['value']) && intval($customer->field_appbonus['und'][0]['value']) == 1)
+			return true;
 	}
 
-	return $app_bonus;
+	if (isset($usr->field_company['und'][0]['target_id']))
+	{
+		$company = node_load($usr->field_company['und'][0]['target_id']);
+		if(isset($company->field_appbonus['und'][0]['value']) && intval($company->field_appbonus['und'][0]['value']) == 1)
+			return true;
+	}
+
+	return false;
 }
 
 /**

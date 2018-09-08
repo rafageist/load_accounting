@@ -277,7 +277,7 @@ function customer_reports_form($form, &$form_state){
 		// TODO: no se ejecuto en customer_reports_form_submit, deberia estar alli
 		load_accounting_upload_bol($form_state, 'accounting/customer/reports');
 
-		$hide_confirmations = is_app_bonus($form_state);
+		$hide_confirmations = is_app_bonus();
 
 		// Load List
 		foreach($loads as $key => $load){
@@ -335,7 +335,7 @@ function customer_payments_form($form, &$form_state){
 
 	$form_state['storage']['truck']->profile = $profile;
 
-	$hide_confirmations = is_app_bonus($form_state);
+	$hide_confirmations = is_app_bonus();
 
 	// Set Compensation Type ($form_state['storage']['compensation'])
 	if($form_state['storage']['payment']['profile'] == 'customer'){

@@ -173,7 +173,14 @@ function load_accounting_payment_loads($js, $payment_id){
 
 		$form_info = [];
 		$payment = node_load($payment_id);
+
+		//drupal_set_message(json_encode($payment, JSON_PRETTY_PRINT));
+
+		$truck_nid = $payment->field_truck['und'][0]['target_id'];
+
 		$loads = [];
+
+		$hide_confirmations = is_app_bonus();
 
 		if(isset($payment->field_loads['und'])){
 
@@ -202,7 +209,8 @@ function load_accounting_payment_loads($js, $payment_id){
 
 					$load = get_load_data($loadx,$is_paid);
 					unset($load['upload']);
-
+					if ($hide_confirmations)
+						unset($load['confirmation']);
 					$loads[] = $load;
 				}
 			}
@@ -211,7 +219,7 @@ function load_accounting_payment_loads($js, $payment_id){
 		$output = '';
 
 		try{
-			$output = theme('table', array('header' => get_loads_header(false), 'rows' => $loads));
+			$output = theme('table', array('header' => get_loads_header($hide_confirmations), 'rows' => $loads));
 		} catch(Exception $exception)
 		{
 

@@ -106,4 +106,116 @@ function load_accounting_install(){
 	} catch(FieldException $e){
 
 	}
+
+	// field_appbonus field
+	$field = [
+		'settings' => [
+			'allowed_values' => [
+				0 => '',
+				1 => '',
+			],
+			'allowed_values_function' => '',
+		],
+		'field_name' => 'field_appbonus',
+		'type' => 'list_boolean',
+		'cardinality' => '1',
+	];
+
+	if(field_info_field($field['field_name']) === null){
+		try{
+			field_create_field($field);
+		} catch(FieldException $e){
+
+		}
+	}
+
+	// field_appbonus instance
+	$instance = [
+		'label' => 'Bonus module',
+		'widget' => [
+			'weight' => '6',
+			'type' => 'options_onoff',
+			'module' => 'options',
+			'active' => 1,
+			'settings' => [
+				'display_label' => 1,
+			],
+		],
+		'settings' => [
+			'user_register_form' => false,
+		],
+		'display' => [
+			'default' => [
+				'label' => 'above',
+				'type' => 'list_default',
+				'settings' => [],
+				'module' => 'list',
+				'weight' => 31,
+			],
+		],
+		'required' => 0,
+		'description' => '',
+		'default_value' => [
+			0 => [
+				'value' => 1,
+			],
+		],
+		'field_name' => 'field_appbonus',
+		'entity_type' => 'node',
+		'bundle' => 'company',
+		'deleted' => '0',
+	];
+
+	if(field_info_instance('node', 'field_appbonus', 'company') === null){
+		try{
+			field_create_instance($instance);
+		} catch(FieldException $e){
+
+		}
+	}
+
+	try{
+		field_update_instance($instance);
+	} catch(FieldException $e){
+
+	}
+
+	// group group_setups
+	$group = (object) [
+		'id' => '97',
+		'identifier' => 'group_setups|node|company|form',
+		'group_name' => 'group_setups',
+		'entity_type' => 'node',
+		'bundle' => 'company',
+		'mode' => 'form',
+		'parent_name' => '',
+		'table' => 'field_group',
+		'type' => 'Normal',
+		'export_type' => 1,
+		'disabled' => false,
+		'label' => 'Setups',
+		'weight' => '1',
+		'children' => [
+			0 => 'field_notify',
+			1 => 'field_audited',
+			2 => 'field_owned',
+			3 => 'field_rateauto',
+			4 => 'field_appbonus'
+		],
+		'format_type' => 'fieldset',
+		'format_settings' => [
+			'label' => 'Setups',
+			'instance_settings' => [
+				'required_fields' => 0,
+				'id' => '',
+				'classes' => '',
+				'description' => ''
+			],
+			'formatter' => 'collapsed'
+		],
+	];
+
+	field_group_group_save($group);
+	ctools_include('export');
+	ctools_export_crud_enable('field_group', $group->identifier);
 }
