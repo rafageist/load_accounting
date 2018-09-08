@@ -21,7 +21,6 @@ var validateFloat = function (e) {
     return true;
 };
 
-
 var validateFloatAndEnter = function (e) {
     if (!avoidEnter(e)) return false;
     return validateFloat(e);
@@ -101,16 +100,15 @@ var number_format = function (number, decimals, dec_point, thousands_sep) {
                 $("#payment-memo").val(memo);
                 $("#payment-date").val(date);
 
-                var updatePaymentValues = function()
-                {
+                var updatePaymentValues = function () {
                     var payment = $("#payment-payment").val() * 1;
                     var accessories = $("#payment-accessories").val() * 1;
                     var miles = $("#payment-miles").val() * 1;
                     var total = payment + accessories;
-                    var rate = total/miles;
+                    var rate = total / miles;
 
                     $("#payment-total").val(number_format(total, 2));
-                    $("#payment-rate").val(number_format(rate , 2));
+                    $("#payment-rate").val(number_format(rate, 2));
                 };
 
                 $("#payment-miles").keydown(validateFloatAndEnter);
@@ -134,28 +132,15 @@ var number_format = function (number, decimals, dec_point, thousands_sep) {
                                 $(this)
                                     .datepicker(datePopup.settings)
                                     .addClass('date-popup-init');
-                                    $(this).click(function(){
-                                        $(this).focus();
-                                    });
+                                $(this).click(function () {
+                                    $(this).focus();
+                                });
                                 break;
                         }
                     }
                 }
 
-               /* $('#payment-date').bind('focus', {
-                    autoPopup: "focus",
-                    changeMonth: true,
-                    changeYear: true,
-                    closeAtTop: false,
-                    dateFormat: "mm/dd/yy",
-                    defaultDate: "0y",
-                    firstDate: 0,
-                    fromTo: false,
-                    speed: "immediate",
-                    yearRange: "+0:+1"
-                }, makeFocusHandler);*/
-
-                $('#payment-date').focus(function(e){
+                $('#payment-date').focus(function (e) {
                     $(this)
                         .datepicker({
                             autoPopup: "focus",
@@ -172,9 +157,9 @@ var number_format = function (number, decimals, dec_point, thousands_sep) {
                         })
                         .addClass('date-popup-init');
 
-                        $(this).click(function(){
-                            $(this).focus();
-                        });
+                    $(this).click(function () {
+                        $(this).focus();
+                    });
                 });
             });
         }

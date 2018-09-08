@@ -260,7 +260,7 @@ function customer_reports_form($form, &$form_state){
 		load_accounting_save_truck_nickname($form_state);
 
 		$truck_node = node_load($truck->truck_nid);
-		$truck->truck_nickname = $truck_node->field_nickname['und'][0]['value'];
+		$truck->truck_nickname = isset($truck_node->field_nickname['und'][0]['value']) ? $truck_node->field_nickname['und'][0]['value'] : '';
 		$form_state['storage']['truck'] = $truck;
 
 		$form["#attributes"]['enctype'] = 'multipart/form-data';

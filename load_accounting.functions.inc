@@ -1,6 +1,11 @@
 <?php
+
 /**
  * Return truck information from a given nid
+ *
+ * @param $tid
+ *
+ * @return array
  */
 function get_truck_info($tid){
 	return db_select('truck_dataset', 't')->fields('t')->condition('truck_nid', $tid, '=')->execute()->fetchAssoc();
@@ -8,6 +13,10 @@ function get_truck_info($tid){
 
 /**
  * Return loads record from a given nid
+ *
+ * @param $tid
+ *
+ * @return array
  */
 function get_truck_loads($tid){
 	$output = [];
@@ -34,9 +43,12 @@ function get_truck_loads($tid){
 	return $output;
 }
 
-
 /**
  * Return extra info from a given load
+ *
+ * @param $lid
+ *
+ * @return array
  */
 function get_load_extra($lid){
 	$output = ['from' => '', 'to' => '', 'delivery' => '', 'doc' => ''];
@@ -51,25 +63,15 @@ function get_load_extra($lid){
 
 	// DELIVERY DATE
 	$delivery = db_select('truck_dataset_loads_delivery', 'p')->fields('p')->condition('load_nid', $lid, '=')->execute()->fetchAll();
-
-	if(count($delivery) > 0){
-		$output['delivery'] = $delivery[count($delivery) - 1]->date;
-	}
+	$output['delivery'] = count($delivery) > 0 ? $delivery[count($delivery) - 1]->date : '';
 
 	// RATECONFIRM
 	$rate = db_select('truck_dataset_loads_confirm', 'r')->fields('r')->condition('load_nid', $lid, '=')->execute()->fetchAll();
-
-	if(count($rate) > 0){
-		$output['doc'] = $rate[0]->fid;
-	}
+	$output['doc'] = count($rate) > 0 ? $rate[0]->fid : '';
 
 	// RATECONFIRM
 	$bol = db_select('truck_dataset_loads_bol', 'r')->fields('r')->condition('load_nid', $lid, '=')->execute()->fetchAll();
-
-	if(count($bol) > 0){
-		$output['bol'] = $bol[0]->fid;
-	}
-	else $output['bol'] = null;
+	$output['bol'] = count($bol) > 0 ? $bol[0]->fid : null;
 
 	return $output;
 }
@@ -77,6 +79,12 @@ function get_load_extra($lid){
 
 /**
  * Return filter load list from a given date range
+ *
+ * @param $loads
+ * @param null $from
+ * @param null $to
+ *
+ * @return mixed
  */
 function filter_loads($loads, $from = null, $to = null){
 	if( ! is_null($from) && ! is_null($to)){
@@ -95,6 +103,15 @@ function filter_loads($loads, $from = null, $to = null){
 
 /**
  * Return performance report from a given load list
+ *
+ * @param $loads
+ * @param $this_week
+ * @param $last_week
+ * @param $this_month
+ * @param $last_month
+ * @param $this_year
+ *
+ * @return array
  */
 function get_loads_report($loads, $this_week, $last_week, $this_month, $last_month, $this_year){
 	// INITIAL REPORT
@@ -249,6 +266,8 @@ function place_wrap_call(&$form, &$form_state){
  * Save truck nickname from form_state
  *
  * @param $form_state
+ *
+ * @throws Exception
  */
 function load_accounting_save_truck_nickname(&$form_state){
 	$form_id = null;
@@ -514,8 +533,7 @@ function load_accounting_delete_payment($payment_id, &$form_state){
 	return true;
 }
 
-function get_loads_header($hide_confirmations = false)
-{
+function get_loads_header($hide_confirmations = false){
 	$loads_header = [
 		'title' => t('4G ID'),
 		'miles' => t('Miles'),

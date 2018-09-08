@@ -43,8 +43,7 @@ function customer_payments_form_submit($form, &$form_state){
 			}
 		}
 
-		drupal_set_message(t('Loads (' . $count . ') set as paid.'), 'status');
-
+		if($count > 0) drupal_set_message(t('Loads (' . $count . ') set as paid.'), 'status');
 	}
 
 	// SET LOADS AS PENDING
@@ -67,7 +66,8 @@ function customer_payments_form_submit($form, &$form_state){
 				unset($form_state['storage']['loads']['paid'][$value]);
 			}
 		}
-		drupal_set_message(t('Loads (' . $count . ') set as pending.'), 'status');
+
+		if($count > 0) drupal_set_message(t('Loads (' . $count . ') set as pending.'), 'status');
 	}
 
 	// PLACE PAYMENT FORM
@@ -81,7 +81,6 @@ function customer_payments_form_submit($form, &$form_state){
 		foreach($form_state['values']['pendloads'] as $key => $value){
 			if($value != 0){
 				$node = node_load($value);
-
 				$pass = true;
 
 				if(empty($node->field_billoflading)){
@@ -143,6 +142,7 @@ function customer_payments_form_submit($form, &$form_state){
 		}
 
 		$form_state['rebuild'] = true;
+
 		return true; // important !!
 	}
 
@@ -202,7 +202,6 @@ function customer_payments_form_submit($form, &$form_state){
 	// delete bulk payment list
 	if(isset($form_state['input']['confirm-dialog-flag']) && $form_state['input']['confirm-dialog-flag'] == 'delete-bulk-payment'){
 		if(isset($form_state['input']['confirm-dialog-submit']) && ! empty($form_state['input']['confirm-dialog-submit'])){
-
 			if(isset($form_state['input']['paymentlist'])){
 				if(is_array($form_state['input']['paymentlist'])){
 					foreach($form_state['input']['paymentlist'] as $key => $value){
@@ -235,8 +234,8 @@ function customer_payments_form_submit($form, &$form_state){
 			if($current_payment != serialize($payment)){
 				$wrap->field_total->set(round($payment->field_payment['und'][0]['value'] + $payment->field_access['und'][0]['value'], 2));
 				$wrap->field_rate->set(round($payment->field_total['und'][0]['value'] / $payment->field_miles['und'][0]['value'], 2));
-
 			}
+
 			$wrap->field_memo->set($form_state['input']['payment-memo']);
 
 			if($current_payment != serialize($payment)){
@@ -254,5 +253,6 @@ function customer_payments_form_submit($form, &$form_state){
 	$form_state['rebuild'] = true;
 
 	drupal_goto("accounting/customer/payments/{$form_state['storage']['truck']->truck_nid}");
+
 	return true;
 }
